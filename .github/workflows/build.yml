@@ -1,0 +1,36 @@
+name: Build Flutter Web
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Clone code từ GitHub
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Cài Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      # 3. Lấy dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 4. Build Flutter Web
+      - name: Build Flutter Web
+        run: flutter build web --release
+
+      # 5. Upload build artifact
+      - name: Upload web build
+        uses: actions/upload-artifact@v3
+        with:
+          name: flutter-web
+          path: build/web

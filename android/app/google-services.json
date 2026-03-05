@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "900092231681",
+    "project_id": "chunha-b7db7",
+    "storage_bucket": "chunha-b7db7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:900092231681:android:6f9b25b462c04f634c8000",
+        "android_client_info": {
+          "package_name": "com.example.chunha"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "900092231681-qb0udta6i893ks8mm263nmu5543tg14e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.chunha",
+            "certificate_hash": "4372783dc02ac9cbe9311997a33fb193eed6b2c9"
+          }
+        },
+        {
+          "client_id": "900092231681-lktsec0m2ffgipu672vr29eht400c574.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBMGgOqlD5mnaFHqbw-M0vfu-ZaCcmxaKg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "900092231681-lktsec0m2ffgipu672vr29eht400c574.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "900092231681-q0h8sq29a6dsmhht7fvk31hk86tso0o6.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.chunha"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -5,10 +5,13 @@ import 'firebase_options.dart';
 
 // Import Clean Architecture layers
 import 'domain/repositories/auth_repository.dart';
+import 'domain/repositories/user_repository.dart';
 import 'domain/usecases/get_auth_status.dart';
 import 'domain/usecases/log_out.dart';
 import 'domain/usecases/login_with_google.dart';
+import 'domain/usecases/save_user_if_new.dart';
 import 'data/repositories/auth_repository_impl.dart';
+import 'data/repositories/user_repository_impl.dart';
 
 // Import BLoC and Screens
 import 'presentation/bloc/auth/auth_bloc.dart';
@@ -24,14 +27,18 @@ void main() async {
 
   // Initialize dependencies
   final AuthRepository authRepository = AuthRepositoryImpl();
+  final UserRepository userRepository = UserRepositoryImpl();
+
   final GetAuthStatusUseCase getAuthStatusUseCase = GetAuthStatusUseCase(authRepository);
   final LoginWithGoogleUseCase loginWithGoogleUseCase = LoginWithGoogleUseCase(authRepository);
   final LogOutUseCase logOutUseCase = LogOutUseCase(authRepository);
+  final SaveUserIfNewUseCase saveUserIfNewUseCase = SaveUserIfNewUseCase(userRepository);
 
   runApp(MyApp(
     getAuthStatusUseCase: getAuthStatusUseCase,
     loginWithGoogleUseCase: loginWithGoogleUseCase,
     logOutUseCase: logOutUseCase,
+    saveUserIfNewUseCase: saveUserIfNewUseCase,
   ));
 }
 
@@ -39,12 +46,14 @@ class MyApp extends StatelessWidget {
   final GetAuthStatusUseCase getAuthStatusUseCase;
   final LoginWithGoogleUseCase loginWithGoogleUseCase;
   final LogOutUseCase logOutUseCase;
+  final SaveUserIfNewUseCase saveUserIfNewUseCase;
 
   const MyApp({
     super.key,
     required this.getAuthStatusUseCase,
     required this.loginWithGoogleUseCase,
     required this.logOutUseCase,
+    required this.saveUserIfNewUseCase,
   });
 
   @override
@@ -54,6 +63,7 @@ class MyApp extends StatelessWidget {
         getAuthStatusUseCase: getAuthStatusUseCase,
         loginWithGoogleUseCase: loginWithGoogleUseCase,
         logOutUseCase: logOutUseCase,
+        saveUserIfNewUseCase: saveUserIfNewUseCase,
       ),
       child: MaterialApp(
         title: 'Chủ Nhà',

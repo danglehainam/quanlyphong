@@ -5,21 +5,25 @@ import 'auth_state.dart';
 import '../../../../domain/usecases/get_auth_status.dart';
 import '../../../../domain/usecases/login_with_google.dart';
 import '../../../../domain/usecases/log_out.dart';
+import '../../../../domain/usecases/save_user_if_new.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final GetAuthStatusUseCase _getAuthStatusUseCase;
   final LoginWithGoogleUseCase _loginWithGoogleUseCase;
   final LogOutUseCase _logOutUseCase;
-  
+  final SaveUserIfNewUseCase _saveUserIfNewUseCase;
+
   StreamSubscription? _authSubscription;
 
   AuthBloc({
     required GetAuthStatusUseCase getAuthStatusUseCase,
     required LoginWithGoogleUseCase loginWithGoogleUseCase,
     required LogOutUseCase logOutUseCase,
+    required SaveUserIfNewUseCase saveUserIfNewUseCase,
   })  : _getAuthStatusUseCase = getAuthStatusUseCase,
         _loginWithGoogleUseCase = loginWithGoogleUseCase,
         _logOutUseCase = logOutUseCase,
+        _saveUserIfNewUseCase = saveUserIfNewUseCase,
         super(AuthInitial()) {
     on<AuthStatusChanged>(_onAuthStatusChanged);
     on<AuthLoginRequested>(_onAuthLoginRequested);
@@ -31,9 +35,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
-  void _onAuthStatusChanged(
-      AuthStatusChanged event, Emitter<AuthState> emit) {
+  Future<void> _onAuthStatusChanged(
+      AuthStatusChanged event, Emitter<AuthState> emit) async {
     if (event.user != null) {
+      // Lưu user vào Firestore nếu là lần đầu đăng nhập
+      // Dùng try-catch riêng để lỗi Firestore không block việc đăng nhập
+      try {
+        await _saveUserIfNewUseCase(event.user!);
+      } catch (e) {
+        // ignore: avoid_print
+        print('Lỗi khi lưu user vào Firestore: $e');
+      }
       emit(AuthAuthenticated(event.user!));
     } else {
       emit(AuthUnauthenticated());
@@ -51,7 +63,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
       // If success, getAuthStatus stream will automatically emit AuthAuthenticated
     } catch (e) {
-      emit(AuthError('Lỗi đăng nhập: \$e'));
+      emit(AuthError('Lỗi đăng nhập: $e'));
       emit(AuthUnauthenticated());
     }
   }
@@ -63,7 +75,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       await _logOutUseCase();
       // If success, getAuthStatus stream will automatically emit AuthUnauthenticated
     } catch (e) {
-      emit(AuthError('Lỗi đăng xuất: \$e'));
+      emit(AuthError('Lỗi đăng xuất: $e'));
     }
   }
 

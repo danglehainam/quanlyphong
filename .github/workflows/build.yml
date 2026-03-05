@@ -10,17 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Clone code từ GitHub
+      # 1. Clone repository
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
-      # 2. Cài Flutter
+      # 2. Setup Flutter
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
 
-      # 3. Lấy dependencies
+      # 3. Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
@@ -29,8 +29,8 @@ jobs:
         run: flutter build web --release
 
       # 5. Upload build artifact
-      - name: Upload web build
-        uses: actions/upload-artifact@v3
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
           name: flutter-web
           path: build/web

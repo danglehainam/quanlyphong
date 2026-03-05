@@ -43,7 +43,7 @@ class HomeScreen extends StatelessWidget {
       ),
       body: const Center(
         child: Text(
-          'Chào mừng đến với ứng dụng Chủ Nhà\\nBạn đã đăng nhập thành công!',
+          'Đặng nhập thành công!',
           style: TextStyle(fontSize: 18),
           textAlign: TextAlign.center,
         ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/phong_entity.dart';
-import '../../core/constants/app_colors.dart';
+import '../../../../domain/entities/phong_entity.dart';
+import '../../../../core/constants/app_colors.dart';
 
 class PhongCardWidget extends StatelessWidget {
   final PhongEntity phong;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../domain/usecases/them_nha_tro.dart';
-import '../../core/constants/app_colors.dart';
+import '../../../../domain/usecases/them_nha_tro.dart';
+import '../../../../core/constants/app_colors.dart';
 
 class ThemNhaTroDialog extends StatefulWidget {
   final ThemNhaTroUseCase themNhaTroUseCase;

@@ -12,7 +12,7 @@ import '../../domain/usecases/watch_nha_tro_list.dart';
 import '../../domain/usecases/watch_phong_list.dart';
 import '../../domain/usecases/them_nha_tro.dart';
 import '../widgets/app_bar_add_button.dart';
-import '../widgets/them_nha_tro_dialog.dart';
+import 'phong/widgets/them_nha_tro_dialog.dart';
 import '../../core/constants/app_colors.dart';
 
 class MainScreen extends StatefulWidget {

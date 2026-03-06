@@ -8,7 +8,7 @@ import '../../bloc/phong/phong_bloc.dart';
 import '../../bloc/phong/phong_event.dart';
 import '../../bloc/phong/phong_state.dart';
 import '../../widgets/empty_data_widget.dart';
-import '../../widgets/phong_card_widget.dart';
+import 'widgets/phong_card_widget.dart';
 
 class PhongScreen extends StatelessWidget {
   final WatchNhaTroListUseCase watchNhaTroList;

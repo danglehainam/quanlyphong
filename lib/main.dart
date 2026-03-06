@@ -10,8 +10,11 @@ import 'domain/usecases/get_auth_status.dart';
 import 'domain/usecases/log_out.dart';
 import 'domain/usecases/login_with_google.dart';
 import 'domain/usecases/save_user_if_new.dart';
+import 'domain/usecases/watch_nha_tro_list.dart';
+import 'domain/usecases/watch_phong_list.dart';
 import 'data/repositories/auth_repository_impl.dart';
 import 'data/repositories/user_repository_impl.dart';
+import 'data/repositories/phong_repository_impl.dart';
 
 // Import BLoC and Screens
 import 'presentation/bloc/auth/auth_bloc.dart';
@@ -28,17 +31,22 @@ void main() async {
   // Initialize dependencies
   final AuthRepository authRepository = AuthRepositoryImpl();
   final UserRepository userRepository = UserRepositoryImpl();
+  final phongRepository = PhongRepositoryImpl();
 
   final GetAuthStatusUseCase getAuthStatusUseCase = GetAuthStatusUseCase(authRepository);
   final LoginWithGoogleUseCase loginWithGoogleUseCase = LoginWithGoogleUseCase(authRepository);
   final LogOutUseCase logOutUseCase = LogOutUseCase(authRepository);
   final SaveUserIfNewUseCase saveUserIfNewUseCase = SaveUserIfNewUseCase(userRepository);
+  final watchNhaTroList = WatchNhaTroListUseCase(phongRepository);
+  final watchPhongList = WatchPhongListUseCase(phongRepository);
 
   runApp(MyApp(
     getAuthStatusUseCase: getAuthStatusUseCase,
     loginWithGoogleUseCase: loginWithGoogleUseCase,
     logOutUseCase: logOutUseCase,
     saveUserIfNewUseCase: saveUserIfNewUseCase,
+    watchNhaTroList: watchNhaTroList,
+    watchPhongList: watchPhongList,
   ));
 }
 
@@ -47,6 +55,8 @@ class MyApp extends StatelessWidget {
   final LoginWithGoogleUseCase loginWithGoogleUseCase;
   final LogOutUseCase logOutUseCase;
   final SaveUserIfNewUseCase saveUserIfNewUseCase;
+  final WatchNhaTroListUseCase watchNhaTroList;
+  final WatchPhongListUseCase watchPhongList;
 
   const MyApp({
     super.key,
@@ -54,6 +64,8 @@ class MyApp extends StatelessWidget {
     required this.loginWithGoogleUseCase,
     required this.logOutUseCase,
     required this.saveUserIfNewUseCase,
+    required this.watchNhaTroList,
+    required this.watchPhongList,
   });
 
   @override
@@ -74,7 +86,11 @@ class MyApp extends StatelessWidget {
         home: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             if (state is AuthAuthenticated) {
-              return MainScreen(user: state.user);
+              return MainScreen(
+                user: state.user,
+                watchNhaTroList: watchNhaTroList,
+                watchPhongList: watchPhongList,
+              );
             }
             if (state is AuthLoading) {
               return const Scaffold(

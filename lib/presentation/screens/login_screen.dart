@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/auth/auth_bloc.dart';
 import '../bloc/auth/auth_event.dart';
 import '../bloc/auth/auth_state.dart';
+import '../widgets/primary_button.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -42,20 +43,12 @@ class LoginScreen extends StatelessWidget {
                   if (isLoading)
                     const Center(child: CircularProgressIndicator())
                   else
-                    ElevatedButton.icon(
+                    PrimaryButton(
                       onPressed: () {
                         context.read<AuthBloc>().add(AuthLoginRequested());
                       },
-                      icon: const Icon(Icons.login),
-                      label: const Text('Đăng nhập với Google', style: TextStyle(fontSize: 18)),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Colors.white,
-                        foregroundColor: Colors.black87,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
+                      label: 'Đăng nhập với Google',
+                      icon: Icons.login,
                     ),
                 ],
               ),

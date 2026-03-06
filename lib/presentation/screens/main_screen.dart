@@ -8,11 +8,20 @@ import 'phong/phong_screen.dart';
 import 'gia/gia_screen.dart';
 import 'hoa_don/hoa_don_screen.dart';
 import 'nguoi_thue/nguoi_thue_screen.dart';
+import '../../domain/usecases/watch_nha_tro_list.dart';
+import '../../domain/usecases/watch_phong_list.dart';
 
 class MainScreen extends StatefulWidget {
   final UserEntity user;
+  final WatchNhaTroListUseCase watchNhaTroList;
+  final WatchPhongListUseCase watchPhongList;
 
-  const MainScreen({super.key, required this.user});
+  const MainScreen({
+    super.key, 
+    required this.user,
+    required this.watchNhaTroList,
+    required this.watchPhongList,
+  });
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -21,11 +30,14 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
-    PhongScreen(),
-    GiaScreen(),
-    HoaDonScreen(),
-    NguoiThueScreen(),
+  late final List<Widget> _screens = [
+    PhongScreen(
+      watchNhaTroList: widget.watchNhaTroList,
+      watchPhongList: widget.watchPhongList,
+    ),
+    const GiaScreen(),
+    const HoaDonScreen(),
+    const NguoiThueScreen(),
   ];
 
   final List<String> _titles = const [
@@ -39,12 +51,35 @@ class _MainScreenState extends State<MainScreen> {
     context.read<AuthBloc>().add(AuthLogoutRequested());
   }
 
+  void _showThemNhaTroDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Thêm nhà trọ'),
+        content: const Text('Chức năng đang phát triển.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Đóng'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(_titles[_currentIndex]),
         actions: [
+          // Nút + chỉ hiện khi đang ở tab Phòng
+          if (_currentIndex == 0)
+            IconButton(
+              icon: const Icon(Icons.add),
+              tooltip: 'Thêm nhà trọ',
+              onPressed: () => _showThemNhaTroDialog(context),
+            ),
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {
               if (state is AuthLoading) {

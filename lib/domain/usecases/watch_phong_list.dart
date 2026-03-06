@@ -6,7 +6,7 @@ class WatchPhongListUseCase {
 
   WatchPhongListUseCase(this._repository);
 
-  Stream<List<PhongEntity>> call(String nhaTroId) {
-    return _repository.watchPhongByNhaTro(nhaTroId);
+  Stream<List<PhongEntity>> call(String nhaTroId, String chuNhaId) {
+    return _repository.watchPhongByNhaTro(nhaTroId, chuNhaId);
   }
 }

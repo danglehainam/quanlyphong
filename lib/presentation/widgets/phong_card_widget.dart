@@ -37,7 +37,7 @@ class PhongCardWidget extends StatelessWidget {
             Icon(Icons.door_front_door_outlined, size: 32, color: color),
             const SizedBox(height: 6),
             Text(
-              phong.tenPhong,
+              'Phòng ${phong.tenPhong}',
               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,

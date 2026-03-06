@@ -28,10 +28,11 @@ class PhongRepositoryImpl implements PhongRepository {
   }
 
   @override
-  Stream<List<PhongEntity>> watchPhongByNhaTro(String nhaTroId) {
+  Stream<List<PhongEntity>> watchPhongByNhaTro(String nhaTroId, String chuNhaId) {
     return _firestore
         .collection('phong')
         .where('nhaTroId', isEqualTo: nhaTroId)
+        .where('chuNhaId', isEqualTo: chuNhaId)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) {
               final data = doc.data();
@@ -48,7 +49,14 @@ class PhongRepositoryImpl implements PhongRepository {
                 moTa: data['moTa'],
                 createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
               );
-            }).toList());
+            }).toList()..sort((a, b) {
+              final numA = int.tryParse(a.tenPhong);
+              final numB = int.tryParse(b.tenPhong);
+              if (numA != null && numB != null) {
+                return numA.compareTo(numB);
+              }
+              return a.tenPhong.compareTo(b.tenPhong);
+            }));
   }
 
   @override
@@ -70,7 +78,7 @@ class PhongRepositoryImpl implements PhongRepository {
     for (int i = 1; i <= soLuongPhong; i++) {
       final phongRef = _firestore.collection('phong').doc();
       batch.set(phongRef, {
-        'tenPhong': 'Phòng $i',
+        'tenPhong': i.toString(),
         'nhaTroId': nhaTroRef.id,
         'chuNhaId': chuNhaId,
         'bangGiaId': null,

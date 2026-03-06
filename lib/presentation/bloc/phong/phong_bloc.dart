@@ -49,7 +49,7 @@ class PhongBloc extends Bloc<PhongEvent, PhongState> {
         // Subscribe phong stream cho các nhà trọ mới
         for (final nhaTro in nhaTroList) {
           if (!_phongSubs.containsKey(nhaTro.id)) {
-            _phongSubs[nhaTro.id] = _watchPhongList(nhaTro.id).listen((phongList) {
+            _phongSubs[nhaTro.id] = _watchPhongList(nhaTro.id, event.chuNhaId).listen((phongList) {
               _phongMap[nhaTro.id] = phongList;
               add(_PhongDataUpdated());
             });

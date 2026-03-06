@@ -3,6 +3,6 @@ import '../entities/phong_entity.dart';
 
 abstract class PhongRepository {
   Stream<List<NhaTroEntity>> watchNhaTroList(String chuNhaId);
-  Stream<List<PhongEntity>> watchPhongByNhaTro(String nhaTroId);
+  Stream<List<PhongEntity>> watchPhongByNhaTro(String nhaTroId, String chuNhaId);
   Future<void> createNhaTroWithPhong(String tenNhaTro, String diaChi, int soLuongPhong, String chuNhaId);
 }

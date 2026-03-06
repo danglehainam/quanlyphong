@@ -85,7 +85,7 @@ SCHEMA:
   khachThue          [CÓ_THỂ_NULL] string[]         — Danh sách ref → nguoi_thue/{nguoiThueId} đang ở phòng này
   chiSoDienHienTai   [CÓ_THỂ_NULL] number           — Chỉ số điện hiện tại (kWh) — tự động điền vào khi tạo hóa đơn mới
   chiSoNuocHienTai   [CÓ_THỂ_NULL] number           — Chỉ số nước hiện tại (m³) — tự động điền vào khi tạo hóa đơn mới
-  trangThai         [CÓ_THỂ_NULL] number [INDEXED] — ENUM: 0 = "trống", 1 = "đã thuê", 2 = "bảo trì"
+  trangThai         [CÓ_THỂ_NULL] number [INDEXED] — ENUM: 0 = "trống", 1 = "đã thuê", 2 = "bảo trì", 3 = "chưa thanh toán"
   moTa              [CÓ_THỂ_NULL] string           — Ghi chú thêm
   createdAt         [BẮT_BUỘC] Timestamp
 

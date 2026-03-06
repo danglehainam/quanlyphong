@@ -32,4 +32,5 @@ class AppColors {
   static const Color phongTrong = success;
   static const Color phongDaThue = primary; // Dùng màu chủ đạo cho phòng bình thường
   static const Color phongBaoTri = warning;
+  static const Color phongChuaThanhToan = error;
 }

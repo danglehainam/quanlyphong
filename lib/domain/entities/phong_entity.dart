@@ -1,7 +1,8 @@
 enum PhongTrangThai {
   trong(0),
   daThue(1),
-  baoTri(2);
+  baoTri(2),
+  chuaThanhToan(3);
 
   final int value;
   const PhongTrangThai(this.value);

@@ -7,10 +7,8 @@ import '../../bloc/auth/auth_state.dart';
 import '../../bloc/phong/phong_bloc.dart';
 import '../../bloc/phong/phong_event.dart';
 import '../../bloc/phong/phong_state.dart';
-import '../../../domain/entities/phong_entity.dart';
 import '../../widgets/empty_data_widget.dart';
-import '../../widgets/status_badge.dart';
-import '../../../core/constants/app_colors.dart';
+import '../../widgets/phong_card_widget.dart';
 
 class PhongScreen extends StatelessWidget {
   final WatchNhaTroListUseCase watchNhaTroList;
@@ -142,40 +140,28 @@ class _NhaTroSection extends StatelessWidget {
             ),
           )
         else
-          ...phongList.map((phong) => _PhongCard(phong: phong)),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              childAspectRatio: 0.85,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+            ),
+            itemCount: phongList.length,
+            itemBuilder: (context, index) {
+              return PhongCardWidget(
+                phong: phongList[index],
+                onTap: () {
+                  // TODO: Navigate to Room Details
+                },
+              );
+            },
+          ),
+        const SizedBox(height: 16),
         const Divider(),
       ],
-    );
-  }
-}
-
-class _PhongCard extends StatelessWidget {
-  final PhongEntity phong;
-
-  const _PhongCard({required this.phong});
-
-  @override
-  Widget build(BuildContext context) {
-    final (label, color) = switch (phong.trangThai) {
-      PhongTrangThai.trong => ('Trống', AppColors.phongTrong),
-      PhongTrangThai.daThue => ('Đã thuê', AppColors.phongDaThue),
-      PhongTrangThai.baoTri => ('Bảo trì', AppColors.phongBaoTri),
-    };
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: color.withValues(alpha: 0.15),
-          child: Icon(Icons.door_front_door_outlined, color: color),
-        ),
-        title: Text(phong.tenPhong),
-        subtitle: phong.moTa != null ? Text(phong.moTa!) : null,
-        trailing: StatusBadge(
-          label: label,
-          color: color,
-        ),
-      ),
     );
   }
 }

@@ -17,7 +17,7 @@ import 'data/repositories/user_repository_impl.dart';
 import 'presentation/bloc/auth/auth_bloc.dart';
 import 'presentation/bloc/auth/auth_state.dart';
 import 'presentation/screens/login_screen.dart';
-import 'presentation/screens/home_screen.dart';
+import 'presentation/screens/main_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,7 +74,7 @@ class MyApp extends StatelessWidget {
         home: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             if (state is AuthAuthenticated) {
-              return HomeScreen(user: state.user);
+              return MainScreen(user: state.user);
             }
             if (state is AuthLoading) {
               return const Scaffold(

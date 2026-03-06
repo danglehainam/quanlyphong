@@ -82,14 +82,17 @@ SCHEMA:
   nhaTroId      [BẮT_BUỘC] string [INDEXED] — ref → nha_tro/{nhaTroId}
   chuNhaId      [BẮT_BUỘC] string [INDEXED] — ref → users/{chuNhaId} (lưu thừa để query nhanh)
   bangGiaId     [CÓ_THỂ_NULL] string [INDEXED] — ref → bang_gia/{bangGiaId} (bảng giá ĐANG áp dụng)
-  khachThue     [CÓ_THỂ_NULL] string[]         — Danh sách ref → nguoi_thue/{nguoiThueId} đang ở phòng này
-  trangThai     [BẮT_BUỘC] number [INDEXED] — ENUM: 0 = "trống", 1 = "đã thuê", 2 = "bảo trì"
-  moTa          [CÓ_THỂ_NULL] string        — Ghi chú thêm
-  createdAt     [BẮT_BUỘC] Timestamp
+  khachThue          [CÓ_THỂ_NULL] string[]         — Danh sách ref → nguoi_thue/{nguoiThueId} đang ở phòng này
+  chiSoDienHienTai   [CÓ_THỂ_NULL] number           — Chỉ số điện hiện tại (kWh) — tự động điền vào khi tạo hóa đơn mới
+  chiSoNuocHienTai   [CÓ_THỂ_NULL] number           — Chỉ số nước hiện tại (m³) — tự động điền vào khi tạo hóa đơn mới
+  trangThai         [CÓ_THỂ_NULL] number [INDEXED] — ENUM: 0 = "trống", 1 = "đã thuê", 2 = "bảo trì"
+  moTa              [CÓ_THỂ_NULL] string           — Ghi chú thêm
+  createdAt         [BẮT_BUỘC] Timestamp
 
 QUY TẮC NGHIỆP VỤ:
-  - trangThai phải đặt thành 1 ("đã thuê") khi có hop_dong với trangThai="dang_thue" cho phòng này.
-  - trangThai trở về 0 ("trống") khi tất cả hop_dong của phòng này đều có trangThai != "dang_thue".
+  - Sau khi lưu mỗi hóa đơn: cập nhật chiSoDienHienTai = hoa_don.chiSoDienCuoi
+    và chiSoNuocHienTai = hoa_don.chiSoNuocCuoi.
+  - Khi tạo hóa đơn mới: đọc 2 trường này từ phong để điền sẵn vào đầu kỳ.
 
 VÍ DỤ DOCUMENT (phong/p101):
 ```json
@@ -99,6 +102,8 @@ VÍ DỤ DOCUMENT (phong/p101):
   "chuNhaId": "abc123",
   "bangGiaId": "bg001",
   "khachThue": ["nt_user001", "nt_user002"],
+  "chiSoDienHienTai": 210,
+  "chiSoNuocHienTai": 35,
   "trangThai": 1,
   "moTa": "Phòng có cửa sổ, ban công nhỏ",
   "createdAt": "2025-01-10T00:00:00Z"
@@ -121,7 +126,7 @@ SCHEMA:
   giaThue          [BẮT_BUỘC]    number           — Giá thuê (VND/tháng)
 
   # --- Cách tính tiền ĐIỆN ---
-  giaDien          [BẮT_BUỘC]    number           — Mức giá điện (VND). Ý nghĩa tuyùy theo cachTinhDien
+  giaDien          [BẮT_BUỘC]    number           — Mức giá điện (VND). Ý nghĩa tuỳ theo cachTinhDien
   cachTinhDien     [BẮT_BUỘC]    number           — ENUM: 0 = VNĐ/số (kWh), 1 = VNĐ/người, 2 = tự nhập khi lập hóa đơn
 
   # --- Cách tính tiền NƯỚC ---

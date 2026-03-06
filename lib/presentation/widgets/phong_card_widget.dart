@@ -34,11 +34,11 @@ class PhongCardWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.door_front_door, size: 40, color: color),
-            const SizedBox(height: 8),
+            Icon(Icons.door_front_door_outlined, size: 32, color: color),
+            const SizedBox(height: 6),
             Text(
               phong.tenPhong,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: AppColors.textPrimary,
                   ),

@@ -50,4 +50,40 @@ class PhongRepositoryImpl implements PhongRepository {
               );
             }).toList());
   }
+
+  @override
+  Future<void> createNhaTroWithPhong(String tenNhaTro, String diaChi, int soLuongPhong, String chuNhaId) async {
+    final batch = _firestore.batch();
+    
+    // 1. Tạo document nhà trọ mới
+    final nhaTroRef = _firestore.collection('nha_tro').doc();
+    final now = FieldValue.serverTimestamp();
+    
+    batch.set(nhaTroRef, {
+      'tenNhaTro': tenNhaTro,
+      'diaChi': diaChi,
+      'chuNhaId': chuNhaId,
+      'createdAt': now,
+    });
+
+    // 2. Tạo N document phòng
+    for (int i = 1; i <= soLuongPhong; i++) {
+      final phongRef = _firestore.collection('phong').doc();
+      batch.set(phongRef, {
+        'tenPhong': 'Phòng $i',
+        'nhaTroId': nhaTroRef.id,
+        'chuNhaId': chuNhaId,
+        'bangGiaId': null,
+        'khachThue': [],
+        'chiSoDienHienTai': null,
+        'chiSoNuocHienTai': null,
+        'trangThai': PhongTrangThai.trong.value,
+        'moTa': null,
+        'createdAt': now,
+      });
+    }
+
+    // Thực thi batch
+    await batch.commit();
+  }
 }

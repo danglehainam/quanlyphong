@@ -23,6 +23,11 @@ class PhongBloc extends Bloc<PhongEvent, PhongState> {
         _watchPhongList = watchPhongList,
         super(PhongInitial()) {
     on<PhongStarted>(_onPhongStarted);
+    on<_PhongDataUpdated>((event, emit) {
+      if (_nhaTroList.isNotEmpty) {
+        emit(_buildLoaded());
+      }
+    });
   }
 
   Future<void> _onPhongStarted(

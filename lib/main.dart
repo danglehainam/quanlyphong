@@ -13,6 +13,7 @@ import 'domain/usecases/login_with_google.dart';
 import 'domain/usecases/save_user_if_new.dart';
 import 'domain/usecases/watch_nha_tro_list.dart';
 import 'domain/usecases/watch_phong_list.dart';
+import 'domain/usecases/them_nha_tro.dart';
 import 'data/repositories/auth_repository_impl.dart';
 import 'data/repositories/user_repository_impl.dart';
 import 'data/repositories/phong_repository_impl.dart';
@@ -40,6 +41,7 @@ void main() async {
   final SaveUserIfNewUseCase saveUserIfNewUseCase = SaveUserIfNewUseCase(userRepository);
   final watchNhaTroList = WatchNhaTroListUseCase(phongRepository);
   final watchPhongList = WatchPhongListUseCase(phongRepository);
+  final themNhaTroUseCase = ThemNhaTroUseCase(phongRepository);
 
   runApp(MyApp(
     getAuthStatusUseCase: getAuthStatusUseCase,
@@ -48,6 +50,7 @@ void main() async {
     saveUserIfNewUseCase: saveUserIfNewUseCase,
     watchNhaTroList: watchNhaTroList,
     watchPhongList: watchPhongList,
+    themNhaTroUseCase: themNhaTroUseCase,
   ));
 }
 
@@ -58,6 +61,7 @@ class MyApp extends StatelessWidget {
   final SaveUserIfNewUseCase saveUserIfNewUseCase;
   final WatchNhaTroListUseCase watchNhaTroList;
   final WatchPhongListUseCase watchPhongList;
+  final ThemNhaTroUseCase themNhaTroUseCase;
 
   const MyApp({
     super.key,
@@ -67,6 +71,7 @@ class MyApp extends StatelessWidget {
     required this.saveUserIfNewUseCase,
     required this.watchNhaTroList,
     required this.watchPhongList,
+    required this.themNhaTroUseCase,
   });
 
   @override
@@ -91,6 +96,7 @@ class MyApp extends StatelessWidget {
                 user: state.user,
                 watchNhaTroList: watchNhaTroList,
                 watchPhongList: watchPhongList,
+                themNhaTroUseCase: themNhaTroUseCase,
               );
             }
             if (state is AuthLoading) {

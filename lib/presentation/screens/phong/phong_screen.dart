@@ -144,10 +144,10 @@ class _NhaTroSection extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
+              crossAxisCount: 4,
               childAspectRatio: 0.85,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
             ),
             itemCount: phongList.length,
             itemBuilder: (context, index) {

@@ -11,7 +11,7 @@ import 'package:chunha/domain/usecases/log_out.dart';
 import 'package:chunha/domain/usecases/save_user_if_new.dart';
 import 'package:chunha/domain/usecases/watch_nha_tro_list.dart';
 import 'package:chunha/domain/usecases/watch_phong_list.dart';
-
+import 'package:chunha/domain/usecases/them_nha_tro.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     final AuthRepository authRepository = AuthRepositoryImpl();
@@ -23,6 +23,7 @@ void main() {
     final SaveUserIfNewUseCase saveUserIfNewUseCase = SaveUserIfNewUseCase(userRepository);
     final watchNhaTroList = WatchNhaTroListUseCase(phongRepository);
     final watchPhongList = WatchPhongListUseCase(phongRepository);
+    final themNhaTroUseCase = ThemNhaTroUseCase(phongRepository);
 
     // Build our app and trigger a frame.
     await tester.pumpWidget(MyApp(
@@ -32,6 +33,7 @@ void main() {
       saveUserIfNewUseCase: saveUserIfNewUseCase,
       watchNhaTroList: watchNhaTroList,
       watchPhongList: watchPhongList,
+      themNhaTroUseCase: themNhaTroUseCase,
     ));
 
     // Wait for the app to initialize

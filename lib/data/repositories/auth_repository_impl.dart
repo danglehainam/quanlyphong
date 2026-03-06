@@ -19,7 +19,7 @@ class AuthRepositoryImpl implements AuthRepository {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
       if (firebaseUser == null) return null;
       return UserEntity(
-        id: firebaseUser.uid,
+        uid: firebaseUser.uid,
         email: firebaseUser.email,
         displayName: firebaseUser.displayName,
         photoUrl: firebaseUser.photoURL,
@@ -67,7 +67,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (user != null) {
         return UserEntity(
-          id: user.uid,
+          uid: user.uid,
           email: user.email,
           displayName: user.displayName,
           photoUrl: user.photoURL,

@@ -7,7 +7,7 @@ class SaveUserIfNewUseCase {
   SaveUserIfNewUseCase(this.repository);
 
   Future<void> call(UserEntity user) async {
-    final exists = await repository.isUserExists(user.id);
+    final exists = await repository.isUserExists(user.uid);
     if (!exists) {
       await repository.saveUser(user);
     }

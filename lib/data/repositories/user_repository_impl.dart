@@ -11,15 +11,15 @@ class UserRepositoryImpl implements UserRepository {
   CollectionReference get _usersCollection => _firestore.collection('users');
 
   @override
-  Future<bool> isUserExists(String userId) async {
-    final doc = await _usersCollection.doc(userId).get();
+  Future<bool> isUserExists(String uid) async {
+    final doc = await _usersCollection.doc(uid).get();
     return doc.exists;
   }
 
   @override
   Future<void> saveUser(UserEntity user) async {
-    await _usersCollection.doc(user.id).set({
-      'id': user.id,
+    await _usersCollection.doc(user.uid).set({
+      'uid': user.uid,
       'email': user.email,
       'displayName': user.displayName,
       'photoUrl': user.photoUrl,

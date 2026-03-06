@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/constants/app_colors.dart';
 
 class PrimaryButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -32,8 +33,8 @@ class PrimaryButton extends StatelessWidget {
   ButtonStyle _buttonStyle() {
     return ElevatedButton.styleFrom(
       padding: const EdgeInsets.symmetric(vertical: 16),
-      backgroundColor: Colors.white,
-      foregroundColor: Colors.black87,
+      backgroundColor: AppColors.primary,
+      foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
       ),

@@ -10,6 +10,8 @@ import 'hoa_don/hoa_don_screen.dart';
 import 'nguoi_thue/nguoi_thue_screen.dart';
 import '../../domain/usecases/watch_nha_tro_list.dart';
 import '../../domain/usecases/watch_phong_list.dart';
+import '../widgets/app_bar_add_button.dart';
+import '../../core/constants/app_colors.dart';
 
 class MainScreen extends StatefulWidget {
   final UserEntity user;
@@ -75,8 +77,7 @@ class _MainScreenState extends State<MainScreen> {
         actions: [
           // Nút + chỉ hiện khi đang ở tab Phòng
           if (_currentIndex == 0)
-            IconButton(
-              icon: const Icon(Icons.add),
+            AppBarAddButton(
               tooltip: 'Thêm nhà trọ',
               onPressed: () => _showThemNhaTroDialog(context),
             ),
@@ -117,7 +118,7 @@ class _MainScreenState extends State<MainScreen> {
                     : null,
               ),
               decoration: const BoxDecoration(
-                color: Colors.blueAccent,
+                color: AppColors.primary,
               ),
             ),
             ListTile(
@@ -154,9 +155,9 @@ class _MainScreenState extends State<MainScreen> {
             ),
             const Divider(),
             ListTile(
-              leading: const Icon(Icons.logout, color: Colors.redAccent),
+              leading: const Icon(Icons.logout, color: AppColors.error),
               title: const Text('Đăng xuất',
-                  style: TextStyle(color: Colors.redAccent)),
+                  style: TextStyle(color: AppColors.error)),
               onTap: () {
                 Navigator.pop(context);
                 _handleLogOut(context);
@@ -170,8 +171,8 @@ class _MainScreenState extends State<MainScreen> {
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.blueAccent,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: AppColors.primary,
+        unselectedItemColor: AppColors.textSecondary,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.meeting_room),

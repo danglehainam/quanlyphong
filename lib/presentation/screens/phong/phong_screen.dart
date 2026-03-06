@@ -10,6 +10,7 @@ import '../../bloc/phong/phong_state.dart';
 import '../../../domain/entities/phong_entity.dart';
 import '../../widgets/empty_data_widget.dart';
 import '../../widgets/status_badge.dart';
+import '../../../core/constants/app_colors.dart';
 
 class PhongScreen extends StatelessWidget {
   final WatchNhaTroListUseCase watchNhaTroList;
@@ -156,9 +157,9 @@ class _PhongCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, color) = switch (phong.trangThai) {
-      PhongTrangThai.trong => ('Trống', Colors.green),
-      PhongTrangThai.daThue => ('Đã thuê', Colors.blue),
-      PhongTrangThai.baoTri => ('Bảo trì', Colors.orange),
+      PhongTrangThai.trong => ('Trống', AppColors.phongTrong),
+      PhongTrangThai.daThue => ('Đã thuê', AppColors.phongDaThue),
+      PhongTrangThai.baoTri => ('Bảo trì', AppColors.phongBaoTri),
     };
 
     return Card(

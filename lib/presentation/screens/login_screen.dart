@@ -4,6 +4,7 @@ import '../bloc/auth/auth_bloc.dart';
 import '../bloc/auth/auth_event.dart';
 import '../bloc/auth/auth_state.dart';
 import '../widgets/primary_button.dart';
+import '../../core/constants/app_colors.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -32,7 +33,7 @@ class LoginScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Icon(Icons.home_work, size: 80, color: Colors.blueAccent),
+                  const Icon(Icons.home_work, size: 80, color: AppColors.primary),
                   const SizedBox(height: 32),
                   const Text(
                     'Chào mừng bạn!',

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'firebase_options.dart';
+import 'core/constants/app_colors.dart';
 
 // Import Clean Architecture layers
 import 'domain/repositories/auth_repository.dart';
@@ -80,7 +81,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Chủ Nhà',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+          colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
           useMaterial3: true,
         ),
         home: BlocBuilder<AuthBloc, AuthState>(

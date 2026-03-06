@@ -44,29 +44,52 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid #e0e0e0;
-      border-top: 5px solid #2196F3;
+    .house-loading {
+      font-size: 64px;
+      animation: bounce 0.8s ease-in-out infinite;
+      user-select: none;
+    }
+
+    .shadow {
+      width: 40px;
+      height: 6px;
+      background: rgba(0, 0, 0, 0.1);
       border-radius: 50%;
-      animation: spin 1s linear infinite;
+      margin-top: 5px;
+      animation: shadow-scale 0.8s ease-in-out infinite;
     }
 
     .loading-text {
-      margin-top: 20px;
-      color: #555;
-      font-size: 16px;
-      font-weight: 500;
+      margin-top: 25px;
+      color: #2196F3;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
 
-    @keyframes spin {
-      0% {
-        transform: rotate(0deg);
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
       }
 
+      50% {
+        transform: translateY(-30px);
+      }
+    }
+
+    @keyframes shadow-scale {
+
+      0%,
       100% {
-        transform: rotate(360deg);
+        transform: scaleX(1);
+        opacity: 0.1;
+      }
+
+      50% {
+        transform: scaleX(0.4);
+        opacity: 0.04;
       }
     }
   </style>
@@ -74,8 +97,9 @@
 
 <body>
   <div id="loading-indicator" class="loading-container">
-    <div class="spinner"></div>
-    <div class="loading-text">Đang tải ứng dụng ChuNha...</div>
+    <div class="house-loading">🏠</div>
+    <div class="shadow"></div>
+    <div class="loading-text">Chủ Nhà đang chuẩn bị phòng...</div>
   </div>
   <!-- Firebase JS SDK (bắt buộc cho Flutter Web) -->
   <script type="module">

@@ -21,10 +21,8 @@
 #   users
 #     └── nha_tro (1 user → nhiều nha_tro)
 #           ├── phong    (1 nha_tro → nhiều phong)
-#           ├── bang_gia (lịch sử giá theo từng phong hoặc cả nhà trọ)
-#           └── hop_dong (1 phong → 1 hop_dong đang hoạt động)
-#                 ├── nguoi_thue (nhiều nguoi_thue → 1 hop_dong qua danhSachNguoiO[])
-#                 └── hoa_don   (1 hop_dong → nhiều hoa_don, mỗi tháng 1 cái)
+#           ├── bang_gia (cấu hình giá theo từng phòng hoặc loại phòng)
+#           └── hoa_don  (hóa đơn thuê theo từng phòng mỗi kỳ)
 
 ---
 
@@ -115,16 +113,28 @@ MỤC ĐÍCH: Lưu trữ cấu hình giá tính tiền (điện, nước, dịch
             từng phòng hoặc theo loại phòng. Cập nhật trực tiếp khi có thay đổi.
 
 SCHEMA:
-  nhaTroId      [BẮT_BUỘC]    string [INDEXED] — ref → nha_tro/{nhaTroId}
-  phongId       [CÓ_THỂ_NULL] string [INDEXED] — ref → phong/{phongId}
-                                                  null = áp dụng cho cả nhà trọ hoặc 1 loại phòng
-  loaiPhong     [CÓ_THỂ_NULL] string [INDEXED] — ENUM: "1_nguoi" | "2_nguoi" | "ghep" (áp dụng theo loại phòng)
-  chuNhaId      [BẮT_BUỘC]    string [INDEXED] — ref → users/{chuNhaId} (lưu thừa)
-  giaThue       [BẮT_BUỘC]    number           — Giá thuê (VND/tháng)
-  giaDien       [BẮT_BUỘC]    number           — Giá điện (VND/kWh)
-  giaNuoc       [BẮT_BUỘC]    number           — Giá nước (VND/m³)
-  giaInternet   [BẮT_BUỘC]    number           — Phí internet (VND/tháng), để 0 nếu không có
-  giaRac        [BẮT_BUỘC]    number           — Phí rác (VND/tháng), để 0 nếu không có
+  nhaTroId         [BẮT_BUỘC]    string [INDEXED] — ref → nha_tro/{nhaTroId}
+  phongId          [CÓ_THỂ_NULL] string [INDEXED] — ref → phong/{phongId}
+                                                    null = áp dụng cho cả nhà trọ hoặc 1 loại phòng
+  loaiPhong        [CÓ_THỂ_NULL] string [INDEXED] — ENUM: "1_nguoi" | "2_nguoi" | "ghep" (áp dụng theo loại phòng)
+  chuNhaId         [BẮT_BUỘC]    string [INDEXED] — ref → users/{chuNhaId} (lưu thừa)
+  giaThue          [BẮT_BUỘC]    number           — Giá thuê (VND/tháng)
+
+  # --- Cách tính tiền ĐIỆN ---
+  giaDien          [BẮT_BUỘC]    number           — Mức giá điện (VND). Ý nghĩa tuyùy theo cachTinhDien
+  cachTinhDien     [BẮT_BUỘC]    number           — ENUM: 0 = VNĐ/số (kWh), 1 = VNĐ/người, 2 = tự nhập khi lập hóa đơn
+
+  # --- Cách tính tiền NƯỚC ---
+  giaNuoc          [BẮT_BUỘC]    number           — Mức giá nước (VND). Ý nghĩa tuỳ theo cachTinhNuoc
+  cachTinhNuoc     [BẮT_BUỘC]    number           — ENUM: 0 = VNĐ/số (m³), 1 = VNĐ/người, 2 = tự nhập khi lập hóa đơn
+
+  # --- Cách tính tiền INTERNET ---
+  giaInternet      [BẮT_BUỘC]    number           — Mức giá internet (VND). Ý nghĩa tuỳ theo cachTinhInternet
+  cachTinhInternet [BẮT_BUỘC]    number           — ENUM: 0 = VNĐ/phòng, 1 = VNĐ/người
+
+  # --- CHI PHÍ KHÁC ---
+  chiPhiKhac       [CÓ_THỂ_NULL] number           — Chi phí khác cố định (VND/tháng), VD: rác, vệ sinh
+  ghiChu           [CÓ_THỂ_NULL] string           — Ghi chú cho chi phí khác, VD: "Tiền rác + vệ sinh hành lang"
 
 VÍ DỤ DOCUMENT (bang_gia/bg001):
 ```json
@@ -135,9 +145,13 @@ VÍ DỤ DOCUMENT (bang_gia/bg001):
   "chuNhaId": "abc123",
   "giaThue": 2500000,
   "giaDien": 3500,
+  "cachTinhDien": 0,
   "giaNuoc": 15000,
+  "cachTinhNuoc": 0,
   "giaInternet": 100000,
-  "giaRac": 20000
+  "cachTinhInternet": 0,
+  "chiPhiKhac": 30000,
+  "ghiChu": "Tiền rác hàng tháng"
 }
 ```
 
@@ -175,85 +189,43 @@ VÍ DỤ DOCUMENT (nguoi_thue/nt_user001):
 }
 ```
 
----
-
-## COLLECTION: hop_dong/{hopDongId}
-
-MỤC ĐÍCH: Hợp đồng thuê — liên kết một phong với một hoặc nhiều nguoi_thue.
-          Mỗi phòng chỉ được có MỘT hop_dong đang hoạt động tại một thời điểm.
-
-SCHEMA:
-  phongId           [BẮT_BUỘC]    string [INDEXED] — ref → phong/{phongId}
-  nguoiThueId       [BẮT_BUỘC]    string           — ref → nguoi_thue (người đại diện ký hợp đồng)
-  khachThue         [BẮT_BUỘC]    string[]         — Tất cả nguoiThueId đang ở trong phòng
-  bangGiaId         [BẮT_BUỘC]    string           — ref → bang_gia (giá tại thời điểm ký hợp đồng)
-  chuNhaId          [BẮT_BUỘC]    string [INDEXED] — ref → users/{chuNhaId}
-  ngayBatDau        [BẮT_BUỘC]    Timestamp [INDEXED] — Ngày bắt đầu thuê
-  ngayKetThuc       [CÓ_THỂ_NULL] Timestamp        — Ngày kết thúc hợp đồng; null = vô thời hạn
-  tienCoc           [BẮT_BUỘC]    number           — Tiền đặt cọc (VND)
-  trangThai         [BẮT_BUỘC]    string [INDEXED] — ENUM: "dang_thue" | "het_han" | "da_ket_thuc"
-  ghiChu            [CÓ_THỂ_NULL] string           — Ghi chú
-  createdAt         [BẮT_BUỘC]    Timestamp
-
-QUY TẮC NGHIỆP VỤ:
-  - Mỗi phòng chỉ được có 1 hop_dong có trangThai = "dang_thue" tại một thời điểm.
-  - Khi tạo hop_dong: cập nhật phong.trangThai thành "da_thue".
-  - Khi kết thúc hợp đồng (trangThai → "da_ket_thuc"): cập nhật phong.trangThai về "trong".
-
-VÍ DỤ DOCUMENT (hop_dong/hd001):
-```json
-{
-  "phongId": "p101",
-  "nguoiThueId": "nt_user001",
-  "khachThue": ["nt_user001", "nt_user002"],
-  "bangGiaId": "bg001",
-  "chuNhaId": "abc123",
-  "ngayBatDau": "2025-02-01T00:00:00Z",
-  "ngayKetThuc": null,
-  "tienCoc": 5000000,
-  "trangThai": "dang_thue",
-  "ghiChu": null,
-  "createdAt": "2025-02-01T00:00:00Z"
-}
-```
-
----
 
 ## COLLECTION: hoa_don/{hoaDonId}
 
-MỤC ĐÍCH: Hóa đơn hàng tháng cho mỗi hop_dong đang hoạt động.
-          Mỗi tháng chỉ có 1 document cho mỗi cặp (hopDongId + thang).
+MỤC ĐÍCH: Hóa đơn được lập mỗi kỳ (tháng/quý) cho từng phòng đang được thuê.
 
 SCHEMA:
-  hopDongId         [BẮT_BUỘC]    string [INDEXED] — ref → hop_dong/{hopDongId}
-  phongId           [BẮT_BUỘC]    string [INDEXED] — ref → phong/{phongId} (lưu thừa)
-  chuNhaId          [BẮT_BUỘC]    string [INDEXED] — ref → users/{chuNhaId} (lưu thừa)
-  thang             [BẮT_BUỘC]    string [INDEXED] — Kỳ hóa đơn, định dạng: "YYYY-MM" VD: "2025-03"
-  chiSoDienDau      [BẮT_BUỘC]    number           — Chỉ số điện đầu kỳ (kWh)
-  chiSoDienCuoi     [BẮT_BUỘC]    number           — Chỉ số điện cuối kỳ (kWh)
-  chiSoNuocDau      [BẮT_BUỘC]    number           — Chỉ số nước đầu kỳ (m³)
-  chiSoNuocCuoi     [BẮT_BUỘC]    number           — Chỉ số nước cuối kỳ (m³)
-  tienThue          [BẮT_BUỘC]    number           — Tiền thuê phòng (VND)
-  tienDien          [BẮT_BUỘC]    number           — Tiền điện = (cuoi - dau) × giaDien
-  tienNuoc          [BẮT_BUỘC]    number           — Tiền nước = (cuoi - dau) × giaNuoc
-  tienDichVuKhac    [BẮT_BUỘC]    number           — Phí khác: internet + rác + phát sinh (VND)
-  tongTien          [BẮT_BUỘC]    number           — Tổng = tienThue + tienDien + tienNuoc + tienDichVuKhac
-  daThanhToan       [BẮT_BUỘC]    boolean [INDEXED] — Trạng thái toán: true = đã thanh toán, false = chưa thanh toán
-  ngayLap           [BẮT_BUỘC]    Timestamp        — Ngày lập hóa đơn
-  ngayThanhToan     [CÓ_THỂ_NULL] Timestamp        — Ngày thu tiền; null = chưa thanh toán
+  bangGiaId         [BẮT_BUỘC]    string           — ref → bang_gia/{bangGiaId} (bảng giá tại thời điểm lập hóa đơn)
+  phongId           [BẮT_BUỘC]    string [INDEXED] — ref → phong/{phongId}
+  chuNhaId          [BẮT_BUỘC]    string [INDEXED] — ref → users/{chuNhaId}
+  tenHoaDon         [BẮT_BUỘC]    string [INDEXED] — Tên hóa đơn, VD: "Tháng 3/2025", "Quý 1/2025"
+  chiSoDienDau      [CÓ_THỂ_NULL] number           — Chỉ số điện đầu kỳ (kWh)
+  chiSoDienCuoi     [CÓ_THỂ_NULL] number           — Chỉ số điện cuối kỳ (kWh)
+  chiSoNuocDau      [CÓ_THỂ_NULL] number           — Chỉ số nước đầu kỳ (m³)
+  chiSoNuocCuoi     [CÓ_THỂ_NULL] number           — Chỉ số nước cuối kỳ (m³)
+  tienThue          [CÓ_THỂ_NULL] number           — Tiền thuê phòng (VND)
+  tienDien          [CÓ_THỂ_NULL] number           — Tiền điện (VND)
+  tienNuoc          [CÓ_THỂ_NULL] number           — Tiền nước (VND)
+  tienInternet      [CÓ_THỂ_NULL] number           — Tiền mạng (VND)
+  tienChiPhiKhac    [CÓ_THỂ_NULL] number           — Chi phí khác (VND)
+  giamGia           [CÓ_THỂ_NULL] number           — Số tiền giảm trực tiếp (VND), null hoặc 0 = không giảm
+  tongTien          [BẮT_BUỘC]    number           — Tổng = tienThue + tienDien + tienNuoc + tienInternet + tienChiPhiKhac - giamGia
+  daThanhToan       [CÓ_THỂ_NULL] boolean [INDEXED] — true = đã thanh toán, false = chưa thanh toán
+  ngayLap           [CÓ_THỂ_NULL] Timestamp        — Ngày lập hóa đơn
+  ngayThanhToan     [CÓ_THỂ_NULL] Timestamp        — Ngày thu tiền
   ghiChu            [CÓ_THỂ_NULL] string           — Ghi chú
 
 QUY TẮC NGHIỆP VỤ:
-  - tongTien phải bằng: tienThue + tienDien + tienNuoc + tienDichVuKhac (luôn tính lại, không tin client).
-  - Ràng buộc duy nhất: chỉ 1 document cho mỗi cặp (hopDongId + thang).
+  - tongTien phải bằng: tienThue + tienDien + tienNuoc + tienInternet + tienChiPhiKhac - giamGia.
+  - Ràng buộc duy nhất: chỉ 1 document cho mỗi cặp (phongId + tenHoaDon).
 
 VÍ DỤ DOCUMENT (hoa_don/hd001_2025-03):
 ```json
 {
-  "hopDongId": "hd001",
+  "bangGiaId": "bg001",
   "phongId": "p101",
   "chuNhaId": "abc123",
-  "thang": "2025-03",
+  "tenHoaDon": "Tháng 3/2025",
   "chiSoDienDau": 150,
   "chiSoDienCuoi": 210,
   "chiSoNuocDau": 30,
@@ -261,8 +233,10 @@ VÍ DỤ DOCUMENT (hoa_don/hd001_2025-03):
   "tienThue": 2500000,
   "tienDien": 210000,
   "tienNuoc": 75000,
-  "tienDichVuKhac": 120000,
-  "tongTien": 2905000,
+  "tienInternet": 100000,
+  "tienChiPhiKhac": 30000,
+  "giamGia": null,
+  "tongTien": 2915000,
   "daThanhToan": false,
   "ngayLap": "2025-03-01T00:00:00Z",
   "ngayThanhToan": null,
@@ -303,7 +277,6 @@ service cloud.firestore {
 |---|---|---|
 | `phong` | `chuNhaId` ASC, `trangThai` ASC | Lọc phòng theo chủ nhà + trạng thái |
 | `phong` | `nhaTroId` ASC, `trangThai` ASC | Lọc phòng theo nhà trọ + trạng thái |
-| `hop_dong` | `phongId` ASC, `trangThai` ASC | Tìm hợp đồng đang thuê của một phòng |
-| `hoa_don` | `chuNhaId` ASC, `thang` ASC | Danh sách hóa đơn theo chủ nhà + tháng |
-| `hoa_don` | `hopDongId` ASC, `thang` ASC | Danh sách hóa đơn của một hợp đồng |
+| `hoa_don` | `chuNhaId` ASC, `tenHoaDon` ASC | Danh sách hóa đơn theo chủ nhà + tên |
+| `hoa_don` | `phongId` ASC, `tenHoaDon` ASC | Danh sách hóa đơn của một phòng |
 | `hoa_don` | `chuNhaId` ASC, `daThanhToan` ASC | Tìm hóa đơn chưa thanh toán/đã thanh toán |

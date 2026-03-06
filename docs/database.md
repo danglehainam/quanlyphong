@@ -12,6 +12,9 @@
 #   - Field có [INDEXED] cần tạo Firestore index
 #   - Mọi document thuộc về một user đều lưu "chuNhaId" để query trực tiếp
 #     (tránh join nhiều bước vì Firestore không hỗ trợ JOIN như SQL)
+#   - ID của document (Ví dụ: `nt001`, `p101`) là khóa chính nằm ở đường dẫn,
+#     KHÔNG LƯU THỪA trường `id` bên trong dữ liệu JSON (ngoại trừ `uid` ở `users`).
+#     Khi đọc dữ liệu lên code, lấy Document ID gán vào thuộc tính `id` của Model.
 #
 # SƠ ĐỒ QUAN HỆ:
 #
@@ -77,30 +80,28 @@ VÍ DỤ DOCUMENT (nha_tro/nt001):
 MỤC ĐÍCH: Từng phòng thuộc một nhà trọ.
 
 SCHEMA:
-  soPhong       [BẮT_BUỘC] string           — Nhãn phòng, VD: "P101", "Phòng 3"
+  tenPhong      [BẮT_BUỘC] string           — Tên phòng (VD: "P101", "Phòng 3")
   nhaTroId      [BẮT_BUỘC] string [INDEXED] — ref → nha_tro/{nhaTroId}
   chuNhaId      [BẮT_BUỘC] string [INDEXED] — ref → users/{chuNhaId} (lưu thừa để query nhanh)
-  loaiPhong     [BẮT_BUỘC] string           — ENUM: "1_nguoi" | "2_nguoi" | "ghep"
-  dienTich      [BẮT_BUỘC] number           — Diện tích (m²)
-  tang          [BẮT_BUỘC] number           — Số tầng (0 = tầng trệt)
-  trangThai     [BẮT_BUỘC] string [INDEXED] — ENUM: "trong" | "da_thue" | "bao_tri"
+  bangGiaId     [CÓ_THỂ_NULL] string [INDEXED] — ref → bang_gia/{bangGiaId} (bảng giá ĐANG áp dụng)
+  khachThue     [CÓ_THỂ_NULL] string[]         — Danh sách ref → nguoi_thue/{nguoiThueId} đang ở phòng này
+  trangThai     [BẮT_BUỘC] number [INDEXED] — ENUM: 0 = "trống", 1 = "đã thuê", 2 = "bảo trì"
   moTa          [CÓ_THỂ_NULL] string        — Ghi chú thêm
   createdAt     [BẮT_BUỘC] Timestamp
 
 QUY TẮC NGHIỆP VỤ:
-  - trangThai phải đặt thành "da_thue" khi có hop_dong với trangThai="dang_thue" cho phòng này.
-  - trangThai trở về "trong" khi tất cả hop_dong của phòng này đều có trangThai != "dang_thue".
+  - trangThai phải đặt thành 1 ("đã thuê") khi có hop_dong với trangThai="dang_thue" cho phòng này.
+  - trangThai trở về 0 ("trống") khi tất cả hop_dong của phòng này đều có trangThai != "dang_thue".
 
 VÍ DỤ DOCUMENT (phong/p101):
 ```json
 {
-  "soPhong": "P101",
+  "tenPhong": "P101",
   "nhaTroId": "nt001",
   "chuNhaId": "abc123",
-  "loaiPhong": "2_nguoi",
-  "dienTich": 20,
-  "tang": 1,
-  "trangThai": "da_thue",
+  "bangGiaId": "bg001",
+  "khachThue": ["nt_user001", "nt_user002"],
+  "trangThai": 1,
   "moTa": "Phòng có cửa sổ, ban công nhỏ",
   "createdAt": "2025-01-10T00:00:00Z"
 }
@@ -110,41 +111,33 @@ VÍ DỤ DOCUMENT (phong/p101):
 
 ## COLLECTION: bang_gia/{bangGiaId}
 
-MỤC ĐÍCH: Bảng giá theo thời kỳ. Mỗi khi giá thay đổi → tạo document MỚI,
-          KHÔNG BAO GIỜ cập nhật document cũ. Cách này giúp lưu lịch sử giá
-          để hóa đơn luôn tính đúng giá tại thời điểm phát sinh.
+MỤC ĐÍCH: Lưu trữ cấu hình giá tính tiền (điện, nước, dịch vụ) cho nhà trọ,
+            từng phòng hoặc theo loại phòng. Cập nhật trực tiếp khi có thay đổi.
 
 SCHEMA:
   nhaTroId      [BẮT_BUỘC]    string [INDEXED] — ref → nha_tro/{nhaTroId}
   phongId       [CÓ_THỂ_NULL] string [INDEXED] — ref → phong/{phongId}
-                                                  null = áp dụng cho cả nhà trọ
+                                                  null = áp dụng cho cả nhà trọ hoặc 1 loại phòng
+  loaiPhong     [CÓ_THỂ_NULL] string [INDEXED] — ENUM: "1_nguoi" | "2_nguoi" | "ghep" (áp dụng theo loại phòng)
   chuNhaId      [BẮT_BUỘC]    string [INDEXED] — ref → users/{chuNhaId} (lưu thừa)
   giaThue       [BẮT_BUỘC]    number           — Giá thuê (VND/tháng)
   giaDien       [BẮT_BUỘC]    number           — Giá điện (VND/kWh)
   giaNuoc       [BẮT_BUỘC]    number           — Giá nước (VND/m³)
   giaInternet   [BẮT_BUỘC]    number           — Phí internet (VND/tháng), để 0 nếu không có
   giaRac        [BẮT_BUỘC]    number           — Phí rác (VND/tháng), để 0 nếu không có
-  hieuLucTu     [BẮT_BUỘC]    Timestamp [INDEXED] — Ngày bắt đầu áp dụng giá này
-  hieuLucDen    [CÓ_THỂ_NULL] Timestamp        — Ngày hết hiệu lực; null = đang áp dụng
-
-QUY TẮC NGHIỆP VỤ:
-  - Khi tạo bang_gia mới: đặt hieuLucDen của document đang active = (hieuLucTu mới - 1 ngày).
-  - Mỗi phongId (hoặc nhaTroId nếu phongId là null) chỉ được có 1 document có hieuLucDen = null.
-  - Để tìm giá đang áp dụng của một phòng: query phongId == phongId AND hieuLucDen == null.
 
 VÍ DỤ DOCUMENT (bang_gia/bg001):
 ```json
 {
   "nhaTroId": "nt001",
-  "phongId": "p101",
+  "phongId": null,
+  "loaiPhong": "2_nguoi",
   "chuNhaId": "abc123",
   "giaThue": 2500000,
   "giaDien": 3500,
   "giaNuoc": 15000,
   "giaInternet": 100000,
-  "giaRac": 20000,
-  "hieuLucTu": "2025-01-01T00:00:00Z",
-  "hieuLucDen": null
+  "giaRac": 20000
 }
 ```
 
@@ -158,10 +151,10 @@ MỤC ĐÍCH: Hồ sơ cá nhân của người thuê. Một hồ sơ tồn tạ
 SCHEMA:
   hoTen         [BẮT_BUỘC]    string           — Họ và tên đầy đủ
   soDienThoai   [BẮT_BUỘC]    string           — Số điện thoại
-  cccd          [BẮT_BUỘC]    string           — Số CCCD hoặc CMND
-  ngaySinh      [BẮT_BUỘC]    Timestamp        — Ngày sinh
+  cccd          [CÓ_THỂ_NULL] string           — Số CCCD hoặc CMND
+  ngaySinh      [CÓ_THỂ_NULL] Timestamp        — Ngày sinh
   queQuan       [CÓ_THỂ_NULL] string           — Quê quán / địa chỉ thường trú
-  anhCCCD       [BẮT_BUỘC]    string[]         — Danh sách URL ảnh CCCD (Firebase Storage)
+  anhCCCD       [CÓ_THỂ_NULL] string[]         — Danh sách URL ảnh CCCD (Firebase Storage)
   chuNhaId      [BẮT_BUỘC]    string [INDEXED] — ref → users/{chuNhaId}
   createdAt     [BẮT_BUỘC]    Timestamp
 
@@ -192,7 +185,7 @@ MỤC ĐÍCH: Hợp đồng thuê — liên kết một phong với một hoặc
 SCHEMA:
   phongId           [BẮT_BUỘC]    string [INDEXED] — ref → phong/{phongId}
   nguoiThueId       [BẮT_BUỘC]    string           — ref → nguoi_thue (người đại diện ký hợp đồng)
-  danhSachNguoiO    [BẮT_BUỘC]    string[]         — Tất cả nguoiThueId đang ở trong phòng
+  khachThue         [BẮT_BUỘC]    string[]         — Tất cả nguoiThueId đang ở trong phòng
   bangGiaId         [BẮT_BUỘC]    string           — ref → bang_gia (giá tại thời điểm ký hợp đồng)
   chuNhaId          [BẮT_BUỘC]    string [INDEXED] — ref → users/{chuNhaId}
   ngayBatDau        [BẮT_BUỘC]    Timestamp [INDEXED] — Ngày bắt đầu thuê
@@ -212,7 +205,7 @@ VÍ DỤ DOCUMENT (hop_dong/hd001):
 {
   "phongId": "p101",
   "nguoiThueId": "nt_user001",
-  "danhSachNguoiO": ["nt_user001", "nt_user002"],
+  "khachThue": ["nt_user001", "nt_user002"],
   "bangGiaId": "bg001",
   "chuNhaId": "abc123",
   "ngayBatDau": "2025-02-01T00:00:00Z",
@@ -245,14 +238,13 @@ SCHEMA:
   tienNuoc          [BẮT_BUỘC]    number           — Tiền nước = (cuoi - dau) × giaNuoc
   tienDichVuKhac    [BẮT_BUỘC]    number           — Phí khác: internet + rác + phát sinh (VND)
   tongTien          [BẮT_BUỘC]    number           — Tổng = tienThue + tienDien + tienNuoc + tienDichVuKhac
-  trangThai         [BẮT_BUỘC]    string [INDEXED] — ENUM: "chua_thanh_toan" | "da_thanh_toan" | "qua_han"
+  daThanhToan       [BẮT_BUỘC]    boolean [INDEXED] — Trạng thái toán: true = đã thanh toán, false = chưa thanh toán
   ngayLap           [BẮT_BUỘC]    Timestamp        — Ngày lập hóa đơn
   ngayThanhToan     [CÓ_THỂ_NULL] Timestamp        — Ngày thu tiền; null = chưa thanh toán
   ghiChu            [CÓ_THỂ_NULL] string           — Ghi chú
 
 QUY TẮC NGHIỆP VỤ:
   - tongTien phải bằng: tienThue + tienDien + tienNuoc + tienDichVuKhac (luôn tính lại, không tin client).
-  - trangThai tự chuyển sang "qua_han" nếu ngayThanhToan = null và ngày hiện tại > (ngayLap + 30 ngày).
   - Ràng buộc duy nhất: chỉ 1 document cho mỗi cặp (hopDongId + thang).
 
 VÍ DỤ DOCUMENT (hoa_don/hd001_2025-03):
@@ -271,7 +263,7 @@ VÍ DỤ DOCUMENT (hoa_don/hd001_2025-03):
   "tienNuoc": 75000,
   "tienDichVuKhac": 120000,
   "tongTien": 2905000,
-  "trangThai": "chua_thanh_toan",
+  "daThanhToan": false,
   "ngayLap": "2025-03-01T00:00:00Z",
   "ngayThanhToan": null,
   "ghiChu": null
@@ -311,8 +303,7 @@ service cloud.firestore {
 |---|---|---|
 | `phong` | `chuNhaId` ASC, `trangThai` ASC | Lọc phòng theo chủ nhà + trạng thái |
 | `phong` | `nhaTroId` ASC, `trangThai` ASC | Lọc phòng theo nhà trọ + trạng thái |
-| `bang_gia` | `phongId` ASC, `hieuLucDen` ASC | Tìm giá đang áp dụng của một phòng |
 | `hop_dong` | `phongId` ASC, `trangThai` ASC | Tìm hợp đồng đang thuê của một phòng |
 | `hoa_don` | `chuNhaId` ASC, `thang` ASC | Danh sách hóa đơn theo chủ nhà + tháng |
 | `hoa_don` | `hopDongId` ASC, `thang` ASC | Danh sách hóa đơn của một hợp đồng |
-| `hoa_don` | `chuNhaId` ASC, `trangThai` ASC | Tìm hóa đơn chưa thanh toán |
+| `hoa_don` | `chuNhaId` ASC, `daThanhToan` ASC | Tìm hóa đơn chưa thanh toán/đã thanh toán |

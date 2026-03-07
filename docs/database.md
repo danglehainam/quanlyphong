@@ -114,16 +114,14 @@ VÍ DỤ DOCUMENT (phong/p101):
 
 ## COLLECTION: bang_gia/{bangGiaId}
 
-MỤC ĐÍCH: Lưu trữ cấu hình giá tính tiền (điện, nước, dịch vụ) cho nhà trọ,
-            từng phòng hoặc theo loại phòng. Cập nhật trực tiếp khi có thay đổi.
+MỤC ĐÍCH: Lưu trữ cấu hình giá tính tiền (điện, nước, dịch vụ) dưới dạng "Template Bảng Giá".
+            Bảng giá này tồn tại độc lập, không gắn chết vào một Nhà Trọ hay một cụm Phòng nào cả.
+            Khi muốn áp dụng giá, 1 Phòng sẽ lưu lại `bangGiaId` mà nó đang sử dụng.
 
 SCHEMA:
-  nhaTroId         [BẮT_BUỘC]    string [INDEXED] — ref → nha_tro/{nhaTroId}
-  phongId          [CÓ_THỂ_NULL] string [INDEXED] — ref → phong/{phongId}
-                                                    null = áp dụng cho cả nhà trọ hoặc 1 loại phòng
-  loaiPhong        [CÓ_THỂ_NULL] string [INDEXED] — ENUM: "1_nguoi" | "2_nguoi" | "ghep" (áp dụng theo loại phòng)
-  chuNhaId         [BẮT_BUỘC]    string [INDEXED] — ref → users/{chuNhaId} (lưu thừa)
-  giaThue          [BẮT_BUỘC]    number           — Giá thuê (VND/tháng)
+  tenBangGia       [BẮT_BUỘC]    string           — Tên bảng giá để dễ chọn (VD: "Giá Sinh Viên VIP", "Giá Gia Đình", "Giá Cố Định 2025")
+  chuNhaId         [BẮT_BUỘC]    string [INDEXED] — ref → users/{chuNhaId} (Phân quyền: Chủ nhà nào tự tạo/quản lý danh sách bảng giá của người đó)
+  giaThue          [BẮT_BUỘC]    number           — Giá thuê cơ sở (VND/tháng)
 
   # --- Cách tính tiền ĐIỆN ---
   giaDien          [BẮT_BUỘC]    number           — Mức giá điện (VND). Ý nghĩa tuỳ theo cachTinhDien
@@ -141,12 +139,10 @@ SCHEMA:
   chiPhiKhac       [CÓ_THỂ_NULL] number           — Chi phí khác cố định (VND/tháng), VD: rác, vệ sinh
   ghiChu           [CÓ_THỂ_NULL] string           — Ghi chú cho chi phí khác, VD: "Tiền rác + vệ sinh hành lang"
 
-VÍ DỤ DOCUMENT (bang_gia/bg001):
+VÍ DỤ DOCUMENT (bang_gia/bg_sinh_vien_vip):
 ```json
 {
-  "nhaTroId": "nt001",
-  "phongId": null,
-  "loaiPhong": "2_nguoi",
+  "tenBangGia": "Bảng Giá Sinh Viên VIP 2025",
   "chuNhaId": "abc123",
   "giaThue": 2500000,
   "giaDien": 3500,

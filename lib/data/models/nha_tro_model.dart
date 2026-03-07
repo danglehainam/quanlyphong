@@ -1,13 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/entities/nha_tro_entity.dart';
 
-class NhaTroModel extends NhaTroEntity {
+class NhaTroModel {
+  final String id;
+  final String tenNhaTro;
+  final String diaChi;
+  final String chuNhaId;
+  final DateTime? createdAt;
+
   const NhaTroModel({
-    required super.id,
-    required super.tenNhaTro,
-    required super.diaChi,
-    required super.chuNhaId,
-    super.createdAt,
+    required this.id,
+    required this.tenNhaTro,
+    required this.diaChi,
+    required this.chuNhaId,
+    this.createdAt,
   });
 
   factory NhaTroModel.fromFirestore(DocumentSnapshot doc) {
@@ -18,6 +24,16 @@ class NhaTroModel extends NhaTroEntity {
       diaChi: data['diaChi'] as String? ?? '',
       chuNhaId: data['chuNhaId'] as String? ?? '',
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
+    );
+  }
+
+  factory NhaTroModel.fromEntity(NhaTroEntity entity) {
+    return NhaTroModel(
+      id: entity.id,
+      tenNhaTro: entity.tenNhaTro,
+      diaChi: entity.diaChi,
+      chuNhaId: entity.chuNhaId,
+      createdAt: entity.createdAt,
     );
   }
 

@@ -1,19 +1,31 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/entities/phong_entity.dart';
 
-class PhongModel extends PhongEntity {
+class PhongModel {
+  final String id;
+  final String tenPhong;
+  final String nhaTroId;
+  final String chuNhaId;
+  final String? bangGiaId;
+  final List<String> khachThue;
+  final double? chiSoDienHienTai;
+  final double? chiSoNuocHienTai;
+  final PhongTrangThai trangThai;
+  final String? moTa;
+  final DateTime? createdAt;
+
   const PhongModel({
-    required super.id,
-    required super.tenPhong,
-    required super.nhaTroId,
-    required super.chuNhaId,
-    super.bangGiaId,
-    super.khachThue = const [],
-    super.chiSoDienHienTai,
-    super.chiSoNuocHienTai,
-    super.trangThai = PhongTrangThai.trong,
-    super.moTa,
-    super.createdAt,
+    required this.id,
+    required this.tenPhong,
+    required this.nhaTroId,
+    required this.chuNhaId,
+    this.bangGiaId,
+    this.khachThue = const [],
+    this.chiSoDienHienTai,
+    this.chiSoNuocHienTai,
+    this.trangThai = PhongTrangThai.trong,
+    this.moTa,
+    this.createdAt,
   });
 
   factory PhongModel.fromFirestore(DocumentSnapshot doc) {
@@ -30,6 +42,22 @@ class PhongModel extends PhongEntity {
       trangThai: PhongTrangThai.fromValue(data['trangThai'] as int? ?? 0),
       moTa: data['moTa'] as String?,
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
+    );
+  }
+
+  factory PhongModel.fromEntity(PhongEntity entity) {
+    return PhongModel(
+      id: entity.id,
+      tenPhong: entity.tenPhong,
+      nhaTroId: entity.nhaTroId,
+      chuNhaId: entity.chuNhaId,
+      bangGiaId: entity.bangGiaId,
+      khachThue: entity.khachThue,
+      chiSoDienHienTai: entity.chiSoDienHienTai,
+      chiSoNuocHienTai: entity.chiSoNuocHienTai,
+      trangThai: entity.trangThai,
+      moTa: entity.moTa,
+      createdAt: entity.createdAt,
     );
   }
 

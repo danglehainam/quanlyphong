@@ -15,12 +15,7 @@ class UserRepositoryImpl implements UserRepository {
 
   @override
   Future<void> saveUser(UserEntity user) async {
-    final userModel = UserModel(
-      uid: user.uid,
-      email: user.email,
-      displayName: user.displayName,
-      photoUrl: user.photoUrl,
-    );
+    final userModel = UserModel.fromEntity(user);
     
     await remoteDataSource.saveUser(userModel);
   }

@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/entities/nha_tro_entity.dart';
 import '../../domain/entities/phong_entity.dart';
 import '../../domain/repositories/phong_repository.dart';
+import '../models/nha_tro_model.dart';
+import '../models/phong_model.dart';
 
 class PhongRepositoryImpl implements PhongRepository {
   final FirebaseFirestore _firestore;
@@ -16,14 +18,7 @@ class PhongRepositoryImpl implements PhongRepository {
         .where('chuNhaId', isEqualTo: chuNhaId)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) {
-              final data = doc.data();
-              return NhaTroEntity(
-                id: doc.id,
-                tenNhaTro: data['tenNhaTro'] ?? '',
-                diaChi: data['diaChi'] ?? '',
-                chuNhaId: data['chuNhaId'] ?? '',
-                createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
-              );
+              return NhaTroModel.fromFirestore(doc).toEntity();
             }).toList());
   }
 
@@ -35,20 +30,7 @@ class PhongRepositoryImpl implements PhongRepository {
         .where('chuNhaId', isEqualTo: chuNhaId)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) {
-              final data = doc.data();
-              return PhongEntity(
-                id: doc.id,
-                tenPhong: data['tenPhong'] ?? '',
-                nhaTroId: data['nhaTroId'] ?? '',
-                chuNhaId: data['chuNhaId'] ?? '',
-                bangGiaId: data['bangGiaId'],
-                khachThue: List<String>.from(data['khachThue'] ?? []),
-                chiSoDienHienTai: (data['chiSoDienHienTai'] as num?)?.toDouble(),
-                chiSoNuocHienTai: (data['chiSoNuocHienTai'] as num?)?.toDouble(),
-                trangThai: PhongTrangThai.fromValue(data['trangThai'] ?? 0),
-                moTa: data['moTa'],
-                createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
-              );
+              return PhongModel.fromFirestore(doc).toEntity();
             }).toList()..sort((a, b) {
               final numA = int.tryParse(a.tenPhong);
               final numB = int.tryParse(b.tenPhong);
@@ -65,30 +47,27 @@ class PhongRepositoryImpl implements PhongRepository {
     
     // 1. Tạo document nhà trọ mới
     final nhaTroRef = _firestore.collection('nha_tro').doc();
-    final now = FieldValue.serverTimestamp();
     
-    batch.set(nhaTroRef, {
-      'tenNhaTro': tenNhaTro,
-      'diaChi': diaChi,
-      'chuNhaId': chuNhaId,
-      'createdAt': now,
-    });
+    final nhaTroModel = NhaTroModel(
+      id: nhaTroRef.id,
+      tenNhaTro: tenNhaTro,
+      diaChi: diaChi,
+      chuNhaId: chuNhaId,
+    );
+    
+    batch.set(nhaTroRef, nhaTroModel.toFirestore());
 
     // 2. Tạo N document phòng
     for (int i = 1; i <= soLuongPhong; i++) {
       final phongRef = _firestore.collection('phong').doc();
-      batch.set(phongRef, {
-        'tenPhong': i.toString(),
-        'nhaTroId': nhaTroRef.id,
-        'chuNhaId': chuNhaId,
-        'bangGiaId': null,
-        'khachThue': [],
-        'chiSoDienHienTai': null,
-        'chiSoNuocHienTai': null,
-        'trangThai': PhongTrangThai.trong.value,
-        'moTa': null,
-        'createdAt': now,
-      });
+      final phongModel = PhongModel(
+        id: phongRef.id,
+        tenPhong: i.toString(),
+        nhaTroId: nhaTroRef.id,
+        chuNhaId: chuNhaId,
+      );
+      
+      batch.set(phongRef, phongModel.toFirestore());
     }
 
     // Thực thi batch

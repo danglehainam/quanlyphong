@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../models/user_model.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final FirebaseAuth _firebaseAuth;
@@ -18,12 +19,12 @@ class AuthRepositoryImpl implements AuthRepository {
   Stream<UserEntity?> get userStream {
     return _firebaseAuth.authStateChanges().map((firebaseUser) {
       if (firebaseUser == null) return null;
-      return UserEntity(
+      return UserModel(
         uid: firebaseUser.uid,
         email: firebaseUser.email,
         displayName: firebaseUser.displayName,
         photoUrl: firebaseUser.photoURL,
-      );
+      ).toEntity();
     });
   }
 
@@ -66,12 +67,12 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       if (user != null) {
-        return UserEntity(
+        return UserModel(
           uid: user.uid,
           email: user.email,
           displayName: user.displayName,
           photoUrl: user.photoURL,
-        );
+        ).toEntity();
       }
       return null;
     } catch (e) {

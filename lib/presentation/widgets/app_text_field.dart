@@ -23,7 +23,7 @@ class AppTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
         controller: controller,
         enabled: !isLoading,
@@ -34,6 +34,8 @@ class AppTextField extends StatelessWidget {
           hintText: hint,
           border: const OutlineInputBorder(),
           alignLabelWithHint: maxLines != null && maxLines! > 1,
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         ),
         validator: (value) {
           if (isRequired && (value == null || value.trim().isEmpty)) {

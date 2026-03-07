@@ -19,12 +19,14 @@ class AppDropdownField<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: 12),
       child: DropdownButtonFormField<T>(
         value: value,
         decoration: InputDecoration(
           labelText: label,
           border: const OutlineInputBorder(),
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         ),
         items: items,
         onChanged: isLoading ? null : onChanged,

@@ -35,7 +35,7 @@ Bridge the application to the external world (Firestore).
     - **CRITICAL**: Never call `emit` inside an unawaited callback or after the handler completes.
 2. **Widgets & Composition**: Build the UI at `lib/presentation/screens/`.
     - **Priority**: Decompose screens into smaller components (Widgets) for maintainability and reuse.
-    - **CRITICAL**: BEFORE creating a new widget, check `lib/presentation/widgets/` to REUSE existing ones (e.g., `EmptyDataWidget`, `AppTextField`, `AppDropdownField`, `AppDialogActions`, `AppSectionHeader`).
+    - **CRITICAL**: BEFORE creating a new widget, check `lib/presentation/widgets/` to REUSE existing ones (e.g., `EmptyDataWidget`, `AppTextField`, `AppDropdownField`, `AppDialogActions`, `AppSectionHeader`, `AppSnackBar`).
     - **Directory Structure**: 
         - Screen-specific widgets: `lib/presentation/screens/[screen_name]/widgets/`.
         - Shared widgets: `lib/presentation/widgets/`.

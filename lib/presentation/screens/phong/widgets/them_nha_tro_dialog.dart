@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/constants/app_colors.dart';
 import '../../../bloc/phong/phong_bloc.dart';
 import '../../../bloc/phong/phong_event.dart';
 import '../../../bloc/phong/phong_state.dart';
 import '../../../widgets/app_text_field.dart';
 import '../../../widgets/app_dialog_actions.dart';
+import '../../../widgets/app_snackbar.dart';
 
 class ThemNhaTroDialog extends StatefulWidget {
   final String chuNhaId;
@@ -50,19 +50,9 @@ class _ThemNhaTroDialogState extends State<ThemNhaTroDialog> {
       listener: (context, state) {
         if (state is ThemNhaTroSuccess) {
           Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Tạo nhà trọ và các phòng thành công!'),
-              backgroundColor: AppColors.success,
-            ),
-          );
+          AppSnackBar.showSuccess(context, 'Tạo nhà trọ và các phòng thành công!');
         } else if (state is ThemNhaTroFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Lỗi: ${state.message}'),
-              backgroundColor: AppColors.error,
-            ),
-          );
+          AppSnackBar.showError(context, 'Lỗi: ${state.message}');
         }
       },
       child: BlocBuilder<PhongBloc, PhongState>(

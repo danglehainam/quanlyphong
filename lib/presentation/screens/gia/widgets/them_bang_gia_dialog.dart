@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/constants/app_colors.dart';
 import '../../../../domain/entities/bang_gia_entity.dart';
 import '../../../bloc/bang_gia/bang_gia_bloc.dart';
 import '../../../bloc/bang_gia/bang_gia_event.dart';
@@ -9,6 +8,7 @@ import '../../../widgets/app_text_field.dart';
 import '../../../widgets/app_dropdown_field.dart';
 import '../../../widgets/app_dialog_actions.dart';
 import '../../../widgets/app_section_header.dart';
+import '../../../widgets/app_snackbar.dart';
 
 class ThemBangGiaDialog extends StatefulWidget {
   final String chuNhaId;
@@ -76,13 +76,9 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
       listener: (context, state) {
         if (state is ThemBangGiaSuccess) {
           Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Thêm bảng giá thành công!'), backgroundColor: AppColors.success),
-          );
+          AppSnackBar.showSuccess(context, 'Thêm bảng giá thành công!');
         } else if (state is ThemBangGiaFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi: ${state.message}'), backgroundColor: AppColors.error),
-          );
+          AppSnackBar.showError(context, 'Lỗi: ${state.message}');
         }
       },
       child: BlocBuilder<BangGiaBloc, BangGiaState>(

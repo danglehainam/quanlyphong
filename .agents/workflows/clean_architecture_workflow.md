@@ -30,7 +30,11 @@ Luôn bắt đầu từ "Trái tim" của ứng dụng.
 ## Bước 3: Presentation Layer (UI & Logic Giao diện)
 1. **BLoC**: Quản lý trạng thái tại `lib/presentation/bloc/`. 
     - Phải có `Event` và `State` tường minh.
-2. **Widgets/Screens**: Xây dựng UI tại `lib/presentation/screens/`.
+2. **Widgets & Composition**: Xây dựng UI tại `lib/presentation/screens/`.
+    - **Ưu tiên**: Chia nhỏ màn hình thành các Widget nhỏ để dễ quản lý và tái sử dụng.
+    - **Cấu trúc thư mục**:
+        - Nếu Widget **chỉ dùng cho 1 màn hình**: Đặt trong thư mục `widgets/` bên trong thư mục của màn hình đó (VD: `lib/presentation/screens/phong/widgets/`).
+        - Nếu Widget **dùng chung cho nhiều màn hình**: Đặt trong thư mục `lib/presentation/widgets/`.
     - **QUY TẮC MÀU SẮC**: Tất cả màu sắc khi sử dụng trong Widget hoặc Style bắt buộc phải lấy từ lớp `AppColors` tại `lib/core/constants/app_colors.dart`.
     - **CẤM**: Tuyệt đối không hardcode mã hex (VD: `Color(0xFF...)`) hoặc sử dụng trực tiếp các hằng số màu của Flutter (VD: `Colors.blue`) trong code UI.
 

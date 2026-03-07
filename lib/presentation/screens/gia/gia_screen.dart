@@ -5,10 +5,15 @@ class GiaScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Giá',
-        style: TextStyle(fontSize: 24),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Bảng giá'),
+      ),
+      body: const Center(
+        child: Text(
+          'Màn hình Bảng giá',
+          style: TextStyle(fontSize: 24),
+        ),
       ),
     );
   }

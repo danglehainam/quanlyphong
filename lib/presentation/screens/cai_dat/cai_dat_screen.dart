@@ -6,31 +6,36 @@ class CaiDatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(
-            Icons.settings,
-            size: 64,
-            color: AppColors.primary,
-          ),
-          SValues.gapH16,
-          Text(
-            'Màn hình Cài đặt',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Cài đặt'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(
+              Icons.settings,
+              size: 64,
+              color: AppColors.primary,
             ),
-          ),
-          Text(
-            'Tính năng này đang được phát triển',
-            style: TextStyle(
-              color: AppColors.textSecondary,
+            SValues.gapH16,
+            Text(
+              'Màn hình Cài đặt',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
             ),
-          ),
-        ],
+            Text(
+              'Tính năng này đang được phát triển',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

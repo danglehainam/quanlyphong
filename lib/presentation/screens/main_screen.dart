@@ -8,25 +8,16 @@ import 'phong/phong_screen.dart';
 import 'gia/gia_screen.dart';
 import 'hoa_don/hoa_don_screen.dart';
 import 'nguoi_thue/nguoi_thue_screen.dart';
-import '../../domain/usecases/watch_nha_tro_list.dart';
-import '../../domain/usecases/watch_phong_list.dart';
-import '../../domain/usecases/them_nha_tro.dart';
 import '../widgets/app_bar_add_button.dart';
 import 'phong/widgets/them_nha_tro_dialog.dart';
 import '../../core/constants/app_colors.dart';
 
 class MainScreen extends StatefulWidget {
   final UserEntity user;
-  final WatchNhaTroListUseCase watchNhaTroList;
-  final WatchPhongListUseCase watchPhongList;
-  final ThemNhaTroUseCase themNhaTroUseCase;
 
   const MainScreen({
     super.key, 
     required this.user,
-    required this.watchNhaTroList,
-    required this.watchPhongList,
-    required this.themNhaTroUseCase,
   });
 
   @override
@@ -37,10 +28,7 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
   late final List<Widget> _screens = [
-    PhongScreen(
-      watchNhaTroList: widget.watchNhaTroList,
-      watchPhongList: widget.watchPhongList,
-    ),
+    const PhongScreen(),
     const GiaScreen(),
     const HoaDonScreen(),
     const NguoiThueScreen(),
@@ -62,7 +50,6 @@ class _MainScreenState extends State<MainScreen> {
       context: context,
       barrierDismissible: false,
       builder: (_) => ThemNhaTroDialog(
-        themNhaTroUseCase: widget.themNhaTroUseCase,
         chuNhaId: widget.user.uid,
       ),
     );

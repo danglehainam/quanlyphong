@@ -1,37 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../domain/usecases/watch_nha_tro_list.dart';
-import '../../../domain/usecases/watch_phong_list.dart';
-import '../../bloc/auth/auth_bloc.dart';
-import '../../bloc/auth/auth_state.dart';
 import '../../bloc/phong/phong_bloc.dart';
-import '../../bloc/phong/phong_event.dart';
 import '../../bloc/phong/phong_state.dart';
 import '../../widgets/empty_data_widget.dart';
 import 'widgets/phong_card_widget.dart';
 
 class PhongScreen extends StatelessWidget {
-  final WatchNhaTroListUseCase watchNhaTroList;
-  final WatchPhongListUseCase watchPhongList;
-
-  const PhongScreen({
-    super.key,
-    required this.watchNhaTroList,
-    required this.watchPhongList,
-  });
+  const PhongScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.read<AuthBloc>().state;
-    if (authState is! AuthAuthenticated) return const SizedBox.shrink();
-
-    return BlocProvider(
-      create: (context) => PhongBloc(
-        watchNhaTroList: watchNhaTroList,
-        watchPhongList: watchPhongList,
-      )..add(PhongStarted(authState.user.uid)),
-      child: const _PhongView(),
-    );
+    return const _PhongView();
   }
 }
 

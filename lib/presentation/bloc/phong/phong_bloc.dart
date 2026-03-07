@@ -6,10 +6,12 @@ import '../../../domain/entities/nha_tro_entity.dart';
 import '../../../domain/entities/phong_entity.dart';
 import '../../../domain/usecases/watch_nha_tro_list.dart';
 import '../../../domain/usecases/watch_phong_list.dart';
+import '../../../domain/usecases/them_nha_tro.dart';
 
 class PhongBloc extends Bloc<PhongEvent, PhongState> {
   final WatchNhaTroListUseCase _watchNhaTroList;
   final WatchPhongListUseCase _watchPhongList;
+  final ThemNhaTroUseCase _themNhaTroUseCase;
 
   StreamSubscription? _nhaTroSub;
   final Map<String, StreamSubscription> _phongSubs = {};
@@ -19,10 +21,13 @@ class PhongBloc extends Bloc<PhongEvent, PhongState> {
   PhongBloc({
     required WatchNhaTroListUseCase watchNhaTroList,
     required WatchPhongListUseCase watchPhongList,
+    required ThemNhaTroUseCase themNhaTroUseCase,
   })  : _watchNhaTroList = watchNhaTroList,
         _watchPhongList = watchPhongList,
+        _themNhaTroUseCase = themNhaTroUseCase,
         super(PhongInitial()) {
     on<PhongStarted>(_onPhongStarted);
+    on<ThemNhaTroRequested>(_onThemNhaTroRequested);
     on<_PhongDataUpdated>((event, emit) {
       if (_nhaTroList.isNotEmpty) {
         emit(_buildLoaded());
@@ -72,6 +77,30 @@ class PhongBloc extends Bloc<PhongEvent, PhongState> {
         return const PhongError('Không thể tải dữ liệu. Vui lòng thử lại.');
       },
     );
+  }
+
+  Future<void> _onThemNhaTroRequested(
+      ThemNhaTroRequested event, Emitter<PhongState> emit) async {
+    final previousState = state;
+    emit(ThemNhaTroLoading());
+    try {
+      await _themNhaTroUseCase(
+        tenNhaTro: event.tenNhaTro,
+        diaChi: event.diaChi,
+        soLuongPhong: event.soLuongPhong,
+        chuNhaId: event.chuNhaId,
+      );
+      emit(ThemNhaTroSuccess());
+      // Trả lại trạng thái cũ (Loaded) để UI tiếp tục hiển thị danh sách
+      if (previousState is PhongLoaded) {
+        emit(previousState);
+      }
+    } catch (e) {
+      emit(ThemNhaTroFailure(e.toString()));
+      if (previousState is PhongLoaded) {
+        emit(previousState);
+      }
+    }
   }
 
   PhongLoaded _buildLoaded() {

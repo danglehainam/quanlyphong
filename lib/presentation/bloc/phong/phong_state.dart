@@ -37,3 +37,17 @@ class PhongError extends PhongState {
   @override
   List<Object?> get props => [message];
 }
+
+// Thêm states mới cho việc thêm nhà trọ
+class ThemNhaTroLoading extends PhongState {}
+
+class ThemNhaTroSuccess extends PhongState {}
+
+class ThemNhaTroFailure extends PhongState {
+  final String message;
+
+  const ThemNhaTroFailure(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}

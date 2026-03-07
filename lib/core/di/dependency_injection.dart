@@ -19,6 +19,7 @@ import '../../domain/usecases/watch_nha_tro_list.dart';
 import '../../domain/usecases/watch_phong_list.dart';
 import '../../domain/usecases/them_nha_tro.dart';
 import '../../presentation/bloc/auth/auth_bloc.dart';
+import '../../presentation/bloc/phong/phong_bloc.dart';
 
 final serviceLocator = GetIt.instance;
 
@@ -48,5 +49,11 @@ Future<void> init() async {
         loginWithGoogleUseCase: serviceLocator(),
         logOutUseCase: serviceLocator(),
         saveUserIfNewUseCase: serviceLocator(),
+      ));
+
+  serviceLocator.registerFactory(() => PhongBloc(
+        watchNhaTroList: serviceLocator(),
+        watchPhongList: serviceLocator(),
+        themNhaTroUseCase: serviceLocator(),
       ));
 }

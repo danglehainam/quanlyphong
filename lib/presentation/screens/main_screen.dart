@@ -8,6 +8,7 @@ import 'phong/phong_screen.dart';
 import 'gia/gia_screen.dart';
 import 'hoa_don/hoa_don_screen.dart';
 import 'nguoi_thue/nguoi_thue_screen.dart';
+import 'cai_dat/cai_dat_screen.dart'; // Added this import
 import '../widgets/app_bar_add_button.dart';
 import 'phong/widgets/them_nha_tro_dialog.dart';
 import '../../core/constants/app_colors.dart';
@@ -27,19 +28,32 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  late final List<Widget> _screens = [
+  final List<Widget> _screens = [
     const PhongScreen(),
     const GiaScreen(),
     const HoaDonScreen(),
     const NguoiThueScreen(),
+    const CaiDatScreen(),
   ];
 
   final List<String> _titles = const [
     'Phòng',
-    'Giá',
+    'Bảng giá',
     'Hóa đơn',
     'Người thuê',
+    'Cài đặt',
   ];
+
+  // Ánh xạ từ index của BottomNavigationBar sang index của _screens
+  // BottomNav có 3 mục: 0 (Phòng), 1 (Hóa đơn), 2 (Người thuê)
+  static const List<int> _bottomNavToScreenMap = [0, 2, 3];
+
+  int _getBottomNavIndex(int screenIndex) {
+    if (screenIndex == 0) return 0;
+    if (screenIndex == 2) return 1;
+    if (screenIndex == 3) return 2;
+    return 0; // Mặc định về tab đầu tiên nếu ở màn hình "Bảng giá" hoặc "Cài đặt"
+  }
 
   void _handleLogOut(BuildContext context) {
     context.read<AuthBloc>().add(AuthLogoutRequested());
@@ -57,6 +71,8 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isScreenInBottomNav = _bottomNavToScreenMap.contains(_currentIndex);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_titles[_currentIndex]),
@@ -108,34 +124,20 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.meeting_room),
-              title: const Text('Phòng'),
-              onTap: () {
-                setState(() => _currentIndex = 0);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.attach_money),
-              title: const Text('Giá'),
+              title: const Text('Bảng giá'),
+              selected: _currentIndex == 1,
               onTap: () {
                 setState(() => _currentIndex = 1);
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: const Icon(Icons.receipt_long),
-              title: const Text('Hóa đơn'),
+              leading: const Icon(Icons.settings),
+              title: const Text('Cài đặt'),
+              selected: _currentIndex == 4,
               onTap: () {
-                setState(() => _currentIndex = 2);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.people),
-              title: const Text('Người thuê'),
-              onTap: () {
-                setState(() => _currentIndex = 3);
+                setState(() => _currentIndex = 4);
                 Navigator.pop(context);
               },
             ),
@@ -154,19 +156,17 @@ class _MainScreenState extends State<MainScreen> {
       ),
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        currentIndex: _getBottomNavIndex(_currentIndex),
+        onTap: (index) {
+          setState(() => _currentIndex = _bottomNavToScreenMap[index]);
+        },
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.primary,
+        selectedItemColor: isScreenInBottomNav ? AppColors.primary : AppColors.textSecondary,
         unselectedItemColor: AppColors.textSecondary,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.meeting_room),
             label: 'Phòng',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
-            label: 'Giá',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.receipt_long),

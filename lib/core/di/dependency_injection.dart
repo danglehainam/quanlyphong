@@ -2,9 +2,15 @@ import 'package:get_it/get_it.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../../domain/repositories/phong_repository.dart';
+
+import '../../data/datasources/remote/auth_remote_data_source.dart';
+import '../../data/datasources/remote/user_remote_data_source.dart';
+import '../../data/datasources/remote/phong_remote_data_source.dart';
+
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/user_repository_impl.dart';
 import '../../data/repositories/phong_repository_impl.dart';
+
 import '../../domain/usecases/get_auth_status.dart';
 import '../../domain/usecases/log_out.dart';
 import '../../domain/usecases/login_with_google.dart';
@@ -17,10 +23,15 @@ import '../../presentation/bloc/auth/auth_bloc.dart';
 final serviceLocator = GetIt.instance;
 
 Future<void> init() async {
-  // 1. Repositories
-  serviceLocator.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl());
-  serviceLocator.registerLazySingleton<UserRepository>(() => UserRepositoryImpl());
-  serviceLocator.registerLazySingleton<PhongRepository>(() => PhongRepositoryImpl());
+  // 1. Data Sources
+  serviceLocator.registerLazySingleton<AuthRemoteDataSource>(() => AuthRemoteDataSourceImpl());
+  serviceLocator.registerLazySingleton<UserRemoteDataSource>(() => UserRemoteDataSourceImpl());
+  serviceLocator.registerLazySingleton<PhongRemoteDataSource>(() => PhongRemoteDataSourceImpl());
+
+  // 2. Repositories
+  serviceLocator.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(remoteDataSource: serviceLocator()));
+  serviceLocator.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(remoteDataSource: serviceLocator()));
+  serviceLocator.registerLazySingleton<PhongRepository>(() => PhongRepositoryImpl(remoteDataSource: serviceLocator()));
 
   // 2. Use Cases
   serviceLocator.registerLazySingleton(() => GetAuthStatusUseCase(serviceLocator()));

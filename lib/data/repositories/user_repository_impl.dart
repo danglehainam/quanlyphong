@@ -1,20 +1,16 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../domain/entities/user_entity.dart';
 import '../../domain/repositories/user_repository.dart';
+import '../datasources/remote/user_remote_data_source.dart';
 import '../models/user_model.dart';
 
 class UserRepositoryImpl implements UserRepository {
-  final FirebaseFirestore _firestore;
+  final UserRemoteDataSource remoteDataSource;
 
-  UserRepositoryImpl({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
-
-  CollectionReference get _usersCollection => _firestore.collection('users');
+  UserRepositoryImpl({required this.remoteDataSource});
 
   @override
   Future<bool> isUserExists(String uid) async {
-    final doc = await _usersCollection.doc(uid).get();
-    return doc.exists;
+    return remoteDataSource.isUserExists(uid);
   }
 
   @override
@@ -26,9 +22,6 @@ class UserRepositoryImpl implements UserRepository {
       photoUrl: user.photoUrl,
     );
     
-    await _usersCollection.doc(user.uid).set({
-      ...userModel.toFirestore(),
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    await remoteDataSource.saveUser(userModel);
   }
 }

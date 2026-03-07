@@ -31,8 +31,11 @@ Bridge the application to the external world (Firestore).
 ## Step 3: Presentation Layer (UI & UI Logic)
 1. **BLoC**: Manage state logic at `lib/presentation/bloc/`. 
     - Clearly separate `Event`, `State`, and `Bloc`.
+    - **CRITICAL**: For Streams (Firestore), ALWAYS use `emit.forEach` instead of `Stream.listen`. 
+    - **CRITICAL**: Never call `emit` inside an unawaited callback or after the handler completes.
 2. **Widgets & Composition**: Build the UI at `lib/presentation/screens/`.
     - **Priority**: Decompose screens into smaller components (Widgets) for maintainability and reuse.
+    - **CRITICAL**: BEFORE creating a new widget, check `lib/presentation/widgets/` to REUSE existing ones (e.g., `EmptyDataWidget`, `AppTextField`, `AppDropdownField`, `AppDialogActions`, `AppSectionHeader`).
     - **Directory Structure**: 
         - Screen-specific widgets: `lib/presentation/screens/[screen_name]/widgets/`.
         - Shared widgets: `lib/presentation/widgets/`.

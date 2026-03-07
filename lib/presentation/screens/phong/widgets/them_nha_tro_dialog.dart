@@ -4,6 +4,8 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../bloc/phong/phong_bloc.dart';
 import '../../../bloc/phong/phong_event.dart';
 import '../../../bloc/phong/phong_state.dart';
+import '../../../widgets/app_text_field.dart';
+import '../../../widgets/app_dialog_actions.dart';
 
 class ThemNhaTroDialog extends StatefulWidget {
   final String chuNhaId;
@@ -75,75 +77,35 @@ class _ThemNhaTroDialogState extends State<ThemNhaTroDialog> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextFormField(
+                    AppTextField(
                       controller: _tenNhaTroController,
-                      enabled: !isBlocLoading,
-                      decoration: const InputDecoration(
-                        labelText: 'Tên nhà trọ',
-                        hintText: 'VD: Trọ Sinh Viên, Nhà trọ số 5...',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) => value == null || value.trim().isEmpty
-                          ? 'Vui lòng nhập tên nhà trọ'
-                          : null,
+                      label: 'Tên nhà trọ',
+                      hint: 'VD: Trọ Sinh Viên...',
+                      isLoading: isBlocLoading,
                     ),
-                    const SizedBox(height: 16),
-                    TextFormField(
+                    AppTextField(
                       controller: _diaChiController,
-                      enabled: !isBlocLoading,
-                      decoration: const InputDecoration(
-                        labelText: 'Địa chỉ',
-                        hintText: 'Nhập địa chỉ...',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) => value == null || value.trim().isEmpty
-                          ? 'Vui lòng nhập địa chỉ'
-                          : null,
+                      label: 'Địa chỉ',
+                      hint: 'Nhập địa chỉ...',
+                      isLoading: isBlocLoading,
                     ),
-                    const SizedBox(height: 16),
-                    TextFormField(
+                    AppTextField(
                       controller: _soLuongPhongController,
-                      enabled: !isBlocLoading,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Số lượng phòng',
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Nhập số lượng';
-                        }
-                        final num = int.tryParse(value);
-                        if (num == null || num <= 0) {
-                          return 'Số phòng không hợp lệ';
-                        }
-                        return null;
-                      },
+                      label: 'Số lượng phòng',
+                      hint: '1',
+                      isLoading: isBlocLoading,
+                      isNumber: true,
                     ),
                   ],
                 ),
               ),
             ),
             actions: [
-              TextButton(
-                onPressed:
-                    isBlocLoading ? null : () => Navigator.of(context).pop(),
-                child: const Text('Hủy',
-                    style: TextStyle(color: AppColors.textSecondary)),
-              ),
-              ElevatedButton(
-                onPressed: isBlocLoading ? null : _submit,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                ),
-                child: isBlocLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                            color: Colors.white, strokeWidth: 2))
-                    : const Text('Tạo mới'),
+              AppDialogActions(
+                isLoading: isBlocLoading,
+                onCancel: () => Navigator.of(context).pop(),
+                onSubmit: _submit,
+                submitLabel: 'Tạo mới',
               ),
             ],
           );

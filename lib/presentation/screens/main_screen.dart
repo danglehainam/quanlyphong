@@ -4,6 +4,7 @@ import '../../domain/entities/user_entity.dart';
 import '../bloc/auth/auth_bloc.dart';
 import '../bloc/auth/auth_event.dart';
 import '../bloc/auth/auth_state.dart';
+import '../bloc/phong/phong_bloc.dart';
 import 'phong/phong_screen.dart';
 import 'gia/gia_screen.dart';
 import 'hoa_don/hoa_don_screen.dart';
@@ -48,8 +49,11 @@ class _MainScreenState extends State<MainScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => ThemNhaTroDialog(
-        chuNhaId: widget.user.uid,
+      builder: (dialogContext) => BlocProvider.value(
+        value: context.read<PhongBloc>(),
+        child: ThemNhaTroDialog(
+          chuNhaId: widget.user.uid,
+        ),
       ),
     );
   }
@@ -113,7 +117,7 @@ class _MainScreenState extends State<MainScreen> {
                 Navigator.pop(context); // Đóng drawer
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => const GiaScreen()),
+                  MaterialPageRoute(builder: (_) => GiaScreen(chuNhaId: widget.user.uid)),
                 );
               },
             ),

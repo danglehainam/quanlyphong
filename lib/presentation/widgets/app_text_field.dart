@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/utils/currency_format.dart';
 
 class AppTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -6,6 +7,7 @@ class AppTextField extends StatelessWidget {
   final String hint;
   final bool isLoading;
   final bool isNumber;
+  final bool isCurrency;
   final bool isRequired;
   final int? maxLines;
 
@@ -16,6 +18,7 @@ class AppTextField extends StatelessWidget {
     required this.hint,
     this.isLoading = false,
     this.isNumber = false,
+    this.isCurrency = false,
     this.isRequired = true,
     this.maxLines = 1,
   });
@@ -28,7 +31,8 @@ class AppTextField extends StatelessWidget {
         controller: controller,
         enabled: !isLoading,
         maxLines: maxLines,
-        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+        keyboardType: isNumber || isCurrency ? TextInputType.number : TextInputType.text,
+        inputFormatters: isCurrency ? [CurrencyInputFormatter()] : null,
         decoration: InputDecoration(
           labelText: label,
           hintText: hint,

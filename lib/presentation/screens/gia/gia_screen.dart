@@ -8,6 +8,7 @@ import '../../bloc/bang_gia/bang_gia_event.dart';
 import '../../bloc/bang_gia/bang_gia_state.dart';
 import '../../widgets/app_bar_add_button.dart';
 import '../../widgets/empty_data_widget.dart';
+import '../../../core/utils/currency_format.dart';
 import 'widgets/them_bang_gia_dialog.dart';
 
 class GiaScreen extends StatelessWidget {
@@ -90,18 +91,18 @@ class GiaScreen extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ExpansionTile(
         title: Text(item.tenBangGia, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        subtitle: Text('Giá thuê: ${item.giaThue} VND/tháng', style: const TextStyle(color: AppColors.primary)),
+        subtitle: Text('Giá thuê: ${CurrencyFormat.format(item.giaThue)} VND/tháng', style: const TextStyle(color: AppColors.primary)),
         leading: const CircleAvatar(
           backgroundColor: AppColors.primary,
           child: Icon(Icons.attach_money, color: Colors.white),
         ),
         childrenPadding: const EdgeInsets.all(16),
         children: [
-          _buildInfoRow(Icons.electric_bolt, 'Điện:', '${item.giaDien} VND (${_getCachTinhText(item.cachTinhDien)})'),
-          _buildInfoRow(Icons.water_drop, 'Nước:', '${item.giaNuoc} VND (${_getCachTinhText(item.cachTinhNuoc)})'),
-          _buildInfoRow(Icons.wifi, 'Internet:', '${item.giaInternet} VND (${item.cachTinhInternet == 0 ? "phòng" : "người"})'),
+          _buildInfoRow(Icons.electric_bolt, 'Điện:', '${CurrencyFormat.format(item.giaDien)} VND (${_getCachTinhText(item.cachTinhDien)})'),
+          _buildInfoRow(Icons.water_drop, 'Nước:', '${CurrencyFormat.format(item.giaNuoc)} VND (${_getCachTinhText(item.cachTinhNuoc)})'),
+          _buildInfoRow(Icons.wifi, 'Internet:', '${CurrencyFormat.format(item.giaInternet)} VND (${item.cachTinhInternet == 0 ? "phòng" : "người"})'),
           if (item.chiPhiKhac != null)
-            _buildInfoRow(Icons.more_horiz, 'Khác:', '${item.chiPhiKhac} VND (${item.ghiChu ?? "Không có ghi chú"})'),
+            _buildInfoRow(Icons.more_horiz, 'Khác:', '${CurrencyFormat.format(item.chiPhiKhac!)} VND (${item.ghiChu ?? "Không có ghi chú"})'),
         ],
       ),
     );

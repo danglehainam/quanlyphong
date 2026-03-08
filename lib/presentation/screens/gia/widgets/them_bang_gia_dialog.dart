@@ -9,6 +9,7 @@ import '../../../widgets/app_dropdown_field.dart';
 import '../../../widgets/app_dialog_actions.dart';
 import '../../../widgets/app_section_header.dart';
 import '../../../widgets/app_snackbar.dart';
+import '../../../../core/utils/currency_format.dart';
 
 class ThemBangGiaDialog extends StatefulWidget {
   final String chuNhaId;
@@ -56,14 +57,14 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
       id: '', // Firestore will generate
       tenBangGia: _tenController.text.trim(),
       chuNhaId: widget.chuNhaId,
-      giaThue: int.parse(_giaThueController.text.trim()),
-      giaDien: int.parse(_giaDienController.text.trim()),
+      giaThue: CurrencyFormat.parse(_giaThueController.text.trim()),
+      giaDien: CurrencyFormat.parse(_giaDienController.text.trim()),
       cachTinhDien: _cachTinhDien,
-      giaNuoc: int.parse(_giaNuocController.text.trim()),
+      giaNuoc: CurrencyFormat.parse(_giaNuocController.text.trim()),
       cachTinhNuoc: _cachTinhNuoc,
-      giaInternet: int.parse(_giaInternetController.text.trim()),
+      giaInternet: CurrencyFormat.parse(_giaInternetController.text.trim()),
       cachTinhInternet: _cachTinhInternet,
-      chiPhiKhac: int.tryParse(_chiPhiKhacController.text.trim()),
+      chiPhiKhac: CurrencyFormat.parse(_chiPhiKhacController.text.trim()),
       ghiChu: _ghiChuController.text.trim().isEmpty ? null : _ghiChuController.text.trim(),
     );
 
@@ -94,10 +95,10 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     AppTextField(controller: _tenController, label: 'Tên bảng giá', hint: 'VD: Giá sinh viên...', isLoading: isLoading),
-                    AppTextField(controller: _giaThueController, label: 'Giá thuê (VND/tháng)', hint: 'VND...', isLoading: isLoading, isNumber: true),
+                    AppTextField(controller: _giaThueController, label: 'Giá thuê (VND/tháng)', hint: 'VND...', isLoading: isLoading, isCurrency: true),
                     const Divider(height: 32),
                     const AppSectionHeader(title: 'Tiền Điện'),
-                    AppTextField(controller: _giaDienController, label: 'Mức giá điện', hint: 'VND...', isLoading: isLoading, isNumber: true),
+                    AppTextField(controller: _giaDienController, label: 'Mức giá điện', hint: 'VND...', isLoading: isLoading, isCurrency: true),
                     AppDropdownField<int>(
                       label: 'Cách tính điện',
                       value: _cachTinhDien,
@@ -110,7 +111,7 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
                     ),
                     const Divider(height: 32),
                     const AppSectionHeader(title: 'Tiền Nước'),
-                    AppTextField(controller: _giaNuocController, label: 'Mức giá nước', hint: 'VND...', isLoading: isLoading, isNumber: true),
+                    AppTextField(controller: _giaNuocController, label: 'Mức giá nước', hint: 'VND...', isLoading: isLoading, isCurrency: true),
                     AppDropdownField<int>(
                       label: 'Cách tính nước',
                       value: _cachTinhNuoc,
@@ -123,7 +124,7 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
                     ),
                     const Divider(height: 32),
                     const AppSectionHeader(title: 'Internet'),
-                    AppTextField(controller: _giaInternetController, label: 'Mức giá internet', hint: 'VND...', isLoading: isLoading, isNumber: true),
+                    AppTextField(controller: _giaInternetController, label: 'Mức giá internet', hint: 'VND...', isLoading: isLoading, isCurrency: true),
                     AppDropdownField<int>(
                       label: 'Cách tính internet',
                       value: _cachTinhInternet,
@@ -135,7 +136,7 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
                     ),
                     const Divider(height: 32),
                     const AppSectionHeader(title: 'Chi phí khác'),
-                    AppTextField(controller: _chiPhiKhacController, label: 'Số tiền (không bắt buộc)', hint: 'VND...', isLoading: isLoading, isNumber: true, isRequired: false),
+                    AppTextField(controller: _chiPhiKhacController, label: 'Số tiền (không bắt buộc)', hint: 'VND...', isLoading: isLoading, isCurrency: true, isRequired: false),
                     AppTextField(controller: _ghiChuController, label: 'Ghi chú chi phí', hint: 'VD: Rác, vệ sinh...', isLoading: isLoading, isRequired: false),
                   ],
                 ),

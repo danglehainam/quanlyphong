@@ -15,6 +15,7 @@ class NguoiThueBloc extends Bloc<NguoiThueEvent, NguoiThueState> {
   final XoaNguoiThueUseCase _xoaNguoiThue;
 
   StreamSubscription? _nguoiThueSub;
+  List<NguoiThueEntity> _items = [];
 
   NguoiThueBloc({
     required WatchNguoiThueListUseCase watchNguoiThueList,
@@ -30,6 +31,11 @@ class NguoiThueBloc extends Bloc<NguoiThueEvent, NguoiThueState> {
     on<ThemNguoiThueRequested>(_onThemNguoiThueRequested);
     on<UpdateNguoiThueRequested>(_onUpdateNguoiThueRequested);
     on<XoaNguoiThueRequested>(_onXoaNguoiThueRequested);
+    on<_NguoiThueDataUpdated>((event, emit) {
+      _items = event.items;
+      emit(NguoiThueLoaded(_items));
+    });
+    on<_NguoiThueDataError>((event, emit) => emit(NguoiThueError(event.message)));
   }
 
   Future<void> _onNguoiThueStarted(
@@ -40,10 +46,6 @@ class NguoiThueBloc extends Bloc<NguoiThueEvent, NguoiThueState> {
       (items) => add(_NguoiThueDataUpdated(items)),
       onError: (error) => add(_NguoiThueDataError(error.toString())),
     );
-
-    // Private events for internal data updates
-    on<_NguoiThueDataUpdated>((event, emit) => emit(NguoiThueLoaded(event.items)));
-    on<_NguoiThueDataError>((event, emit) => emit(NguoiThueError(event.message)));
   }
 
   Future<void> _onThemNguoiThueRequested(
@@ -55,8 +57,10 @@ class NguoiThueBloc extends Bloc<NguoiThueEvent, NguoiThueState> {
       );
       await _themNguoiThue(nguoiThueToSave, phongId: event.phongId);
       emit(NguoiThueActionSuccess());
+      if (_items.isNotEmpty) emit(NguoiThueLoaded(_items));
     } catch (e) {
       emit(NguoiThueActionFailure(e.toString()));
+      if (_items.isNotEmpty) emit(NguoiThueLoaded(_items));
     }
   }
 
@@ -73,8 +77,10 @@ class NguoiThueBloc extends Bloc<NguoiThueEvent, NguoiThueState> {
         newPhongId: event.newPhongId,
       );
       emit(NguoiThueActionSuccess());
+      if (_items.isNotEmpty) emit(NguoiThueLoaded(_items));
     } catch (e) {
       emit(NguoiThueActionFailure(e.toString()));
+      if (_items.isNotEmpty) emit(NguoiThueLoaded(_items));
     }
   }
 
@@ -84,8 +90,10 @@ class NguoiThueBloc extends Bloc<NguoiThueEvent, NguoiThueState> {
     try {
       await _xoaNguoiThue(event.nguoiThueId, currentPhongId: event.currentPhongId);
       emit(NguoiThueActionSuccess());
+      if (_items.isNotEmpty) emit(NguoiThueLoaded(_items));
     } catch (e) {
       emit(NguoiThueActionFailure(e.toString()));
+      if (_items.isNotEmpty) emit(NguoiThueLoaded(_items));
     }
   }
 

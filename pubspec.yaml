@@ -43,6 +43,7 @@ dependencies:
   get_it: ^9.2.1
   intl: ^0.20.2
   rxdart: ^0.28.0
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

@@ -14,6 +14,7 @@ import '../../bloc/ap_dung_bang_gia/ap_dung_bang_gia_event.dart';
 import 'widgets/them_bang_gia_dialog.dart';
 import 'widgets/ap_dung_bang_gia_dialog.dart';
 import '../../widgets/app_confirm_dialog.dart';
+import '../../widgets/app_expansion_card.dart';
 
 class GiaScreen extends StatelessWidget {
   final String chuNhaId;
@@ -120,62 +121,36 @@ class GiaScreen extends StatelessWidget {
   }
 
   Widget _buildBangGiaCard(BuildContext context, BangGiaEntity item) {
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ExpansionTile(
-        title: Text(item.tenBangGia, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        subtitle: Text('Giá thuê: ${CurrencyFormat.format(item.giaThue)} VND/tháng', style: const TextStyle(color: AppColors.primary)),
-        leading: const CircleAvatar(
-          backgroundColor: AppColors.primary,
-          child: Icon(Icons.attach_money, color: Colors.white),
-        ),
-        childrenPadding: const EdgeInsets.all(16),
-        children: [
-          _buildInfoRow(Icons.electric_bolt, 'Điện:', '${CurrencyFormat.format(item.giaDien)} VND (${_getCachTinhText(item.cachTinhDien)})'),
-          _buildInfoRow(Icons.water_drop, 'Nước:', '${CurrencyFormat.format(item.giaNuoc)} VND (${_getCachTinhText(item.cachTinhNuoc)})'),
-          _buildInfoRow(Icons.wifi, 'Internet:', '${CurrencyFormat.format(item.giaInternet)} VND (${item.cachTinhInternet == 0 ? "phòng" : "người"})'),
-          if (item.chiPhiKhac != null)
-            _buildInfoRow(Icons.more_horiz, 'Khác:', '${CurrencyFormat.format(item.chiPhiKhac!)} VND (${item.ghiChu ?? "Không có ghi chú"})'),
-          const SizedBox(height: 16),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.check_circle_outline, size: 20),
-                  label: const Text('Áp dụng cho phòng'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.primary,
-                    side: const BorderSide(color: AppColors.primary),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                  onPressed: () => _showApDungBangGiaDialog(context, item.id),
-                ),
-              ),
-              const SizedBox(width: 12),
-              IconButton.filledTonal(
-                icon: const Icon(Icons.edit_outlined),
-                onPressed: () => _showThemBangGiaDialog(context, bangGia: item),
-                style: IconButton.styleFrom(
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                  foregroundColor: AppColors.primary,
-                ),
-              ),
-              const SizedBox(width: 12),
-              IconButton.filledTonal(
-                icon: const Icon(Icons.delete_outline, color: AppColors.error),
-                onPressed: () => _confirmDeleteBangGia(context, item),
-                style: IconButton.styleFrom(
-                  backgroundColor: AppColors.error.withValues(alpha: 0.1),
-                  foregroundColor: AppColors.error,
-                ),
-              ),
-            ],
-          ),
-        ],
+    return AppExpansionCard(
+      title: Text(item.tenBangGia, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+      subtitle: Text('Giá thuê: ${CurrencyFormat.format(item.giaThue)} VND/tháng', style: const TextStyle(color: AppColors.primary)),
+      leading: const CircleAvatar(
+        backgroundColor: AppColors.primary,
+        child: Icon(Icons.attach_money, color: Colors.white),
       ),
+      onEdit: () => _showThemBangGiaDialog(context, bangGia: item),
+      onDelete: () => _confirmDeleteBangGia(context, item),
+      extraActions: [
+        Expanded(
+          child: OutlinedButton.icon(
+            icon: const Icon(Icons.check_circle_outline, size: 20),
+            label: const Text('Áp dụng cho phòng'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.primary,
+              side: const BorderSide(color: AppColors.primary),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+            onPressed: () => _showApDungBangGiaDialog(context, item.id),
+          ),
+        ),
+      ],
+      children: [
+        _buildInfoRow(Icons.electric_bolt, 'Điện:', '${CurrencyFormat.format(item.giaDien)} VND (${_getCachTinhText(item.cachTinhDien)})'),
+        _buildInfoRow(Icons.water_drop, 'Nước:', '${CurrencyFormat.format(item.giaNuoc)} VND (${_getCachTinhText(item.cachTinhNuoc)})'),
+        _buildInfoRow(Icons.wifi, 'Internet:', '${CurrencyFormat.format(item.giaInternet)} VND (${item.cachTinhInternet == 0 ? "phòng" : "người"})'),
+        if (item.chiPhiKhac != null)
+          _buildInfoRow(Icons.more_horiz, 'Khác:', '${CurrencyFormat.format(item.chiPhiKhac!)} VND (${item.ghiChu ?? "Không có ghi chú"})'),
+      ],
     );
   }
 

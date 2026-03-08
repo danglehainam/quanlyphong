@@ -13,6 +13,8 @@ abstract class PhongRemoteDataSource {
   Future<void> xoaBangGiaKhoiTatCaPhong(String bangGiaId, String chuNhaId);
   Future<void> addKhachThueToPhong(String phongId, String nguoiThueId);
   Future<void> removeKhachThueFromPhong(String phongId, String nguoiThueId);
+  Future<PhongModel?> getPhongById(String phongId);
+  Future<NhaTroModel?> getNhaTroById(String nhaTroId);
 }
 
 class PhongRemoteDataSourceImpl implements PhongRemoteDataSource {
@@ -182,5 +184,19 @@ class PhongRemoteDataSourceImpl implements PhongRemoteDataSource {
       'khachThue': FieldValue.arrayRemove([nguoiThueId]),
       'trangThai': status,
     });
+  }
+
+  @override
+  Future<PhongModel?> getPhongById(String phongId) async {
+    final doc = await _firestore.collection('phong').doc(phongId).get();
+    if (!doc.exists) return null;
+    return PhongModel.fromFirestore(doc);
+  }
+
+  @override
+  Future<NhaTroModel?> getNhaTroById(String nhaTroId) async {
+    final doc = await _firestore.collection('nha_tro').doc(nhaTroId).get();
+    if (!doc.exists) return null;
+    return NhaTroModel.fromFirestore(doc);
   }
 }

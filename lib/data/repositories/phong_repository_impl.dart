@@ -62,4 +62,16 @@ class PhongRepositoryImpl implements PhongRepository {
   Future<void> removeKhachThueFromPhong(String phongId, String nguoiThueId) {
     return remoteDataSource.removeKhachThueFromPhong(phongId, nguoiThueId);
   }
+
+  @override
+  Future<PhongEntity?> getPhongById(String phongId) async {
+    final model = await remoteDataSource.getPhongById(phongId);
+    return model?.toEntity();
+  }
+
+  @override
+  Future<NhaTroEntity?> getNhaTroById(String nhaTroId) async {
+    final model = await remoteDataSource.getNhaTroById(nhaTroId);
+    return model?.toEntity();
+  }
 }

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/di/dependency_Injection.dart';
 import '../../../../domain/entities/nguoi_thue_entity.dart';
+import '../../../../domain/usecases/get_phong.dart';
 import '../../../bloc/ap_dung_bang_gia/ap_dung_bang_gia_bloc.dart';
 import '../../../bloc/ap_dung_bang_gia/ap_dung_bang_gia_event.dart';
 import '../../../bloc/nguoi_thue/nguoi_thue_bloc.dart';
@@ -34,9 +35,9 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
   late TextEditingController _soDienThoaiController;
   late TextEditingController _cccdController;
   late TextEditingController _queQuanController;
+  late TextEditingController _phongNameController;
   DateTime? _birthday;
   String? _selectedPhongId;
-  String? _selectedPhongName;
 
   bool get _isEditing => widget.initialNguoiThue != null;
 
@@ -47,8 +48,22 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
     _soDienThoaiController = TextEditingController(text: widget.initialNguoiThue?.soDienThoai ?? '');
     _cccdController = TextEditingController(text: widget.initialNguoiThue?.cccd ?? '');
     _queQuanController = TextEditingController(text: widget.initialNguoiThue?.queQuan ?? '');
+    _phongNameController = TextEditingController();
     _birthday = widget.initialNguoiThue?.ngaySinh;
     _selectedPhongId = widget.initialNguoiThue?.phongId;
+
+    if (_selectedPhongId != null) {
+      _loadRoomDetail();
+    }
+  }
+
+  Future<void> _loadRoomDetail() async {
+    final detail = await serviceLocator<GetPhongUseCase>().call(_selectedPhongId!);
+    if (detail != null && mounted) {
+      setState(() {
+        _phongNameController.text = 'Phòng ${detail.phong.tenPhong} (${detail.nhaTro?.tenNhaTro ?? ''})';
+      });
+    }
   }
 
   @override
@@ -57,6 +72,7 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
     _soDienThoaiController.dispose();
     _cccdController.dispose();
     _queQuanController.dispose();
+    _phongNameController.dispose();
     super.dispose();
   }
 
@@ -73,6 +89,7 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
       createdAt: widget.initialNguoiThue?.createdAt,
       anhCCCD: widget.initialNguoiThue?.anhCCCD ?? [],
       ngaySinh: _birthday,
+      phongId: widget.initialNguoiThue?.phongId,
     );
 
     if (_isEditing) {
@@ -117,7 +134,7 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
         setState(() {
           final result = selectedIds.first;
           _selectedPhongId = result.id;
-          _selectedPhongName = result.displayName;
+          _phongNameController.text = result.displayName;
         });
       }
     });
@@ -199,11 +216,8 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
                   isRequired: false,
                 ),
                 const SizedBox(height: 16),
-                // Chọn phòng
                 AppTextField(
-                  controller: TextEditingController(
-                    text: _selectedPhongName ?? '',
-                  ),
+                  controller: _phongNameController,
                   label: 'Phòng thuê (Tùy chọn)',
                   hint: 'Chọn phòng thuê...',
                   readOnly: true,

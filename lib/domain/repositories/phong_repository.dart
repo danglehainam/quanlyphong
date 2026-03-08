@@ -12,4 +12,6 @@ abstract class PhongRepository {
   Future<void> xoaBangGiaKhoiTatCaPhong(String bangGiaId, String chuNhaId);
   Future<void> addKhachThueToPhong(String phongId, String nguoiThueId);
   Future<void> removeKhachThueFromPhong(String phongId, String nguoiThueId);
+  Future<PhongEntity?> getPhongById(String phongId);
+  Future<NhaTroEntity?> getNhaTroById(String nhaTroId);
 }

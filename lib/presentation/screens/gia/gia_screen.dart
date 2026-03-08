@@ -13,6 +13,7 @@ import '../../bloc/ap_dung_bang_gia/ap_dung_bang_gia_bloc.dart';
 import '../../bloc/ap_dung_bang_gia/ap_dung_bang_gia_event.dart';
 import 'widgets/them_bang_gia_dialog.dart';
 import 'widgets/ap_dung_bang_gia_dialog.dart';
+import '../../widgets/app_confirm_dialog.dart';
 
 class GiaScreen extends StatelessWidget {
   final String chuNhaId;
@@ -22,7 +23,7 @@ class GiaScreen extends StatelessWidget {
     required this.chuNhaId,
   });
 
-  void _showThemBangGiaDialog(BuildContext context) {
+  void _showThemBangGiaDialog(BuildContext context, {BangGiaEntity? bangGia}) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -34,7 +35,10 @@ class GiaScreen extends StatelessWidget {
           maxChildSize: 0.9,
           minChildSize: 0.5,
           expand: false,
-          builder: (_, controller) => ThemBangGiaDialog(chuNhaId: chuNhaId),
+          builder: (_, controller) => ThemBangGiaDialog(
+            chuNhaId: chuNhaId,
+            initialBangGia: bangGia,
+          ),
         ),
       ),
     );
@@ -135,21 +139,62 @@ class GiaScreen extends StatelessWidget {
           if (item.chiPhiKhac != null)
             _buildInfoRow(Icons.more_horiz, 'Khác:', '${CurrencyFormat.format(item.chiPhiKhac!)} VND (${item.ghiChu ?? "Không có ghi chú"})'),
           const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              icon: const Icon(Icons.check_circle_outline),
-              label: const Text('Áp dụng cho phòng'),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: const BorderSide(color: AppColors.primary),
-                padding: const EdgeInsets.symmetric(vertical: 12),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.check_circle_outline, size: 20),
+                  label: const Text('Áp dụng cho phòng'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.primary,
+                    side: const BorderSide(color: AppColors.primary),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onPressed: () => _showApDungBangGiaDialog(context, item.id),
+                ),
               ),
-              onPressed: () => _showApDungBangGiaDialog(context, item.id),
-            ),
-          )
+              const SizedBox(width: 12),
+              IconButton.filledTonal(
+                icon: const Icon(Icons.edit_outlined),
+                onPressed: () => _showThemBangGiaDialog(context, bangGia: item),
+                style: IconButton.styleFrom(
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                  foregroundColor: AppColors.primary,
+                ),
+              ),
+              const SizedBox(width: 12),
+              IconButton.filledTonal(
+                icon: const Icon(Icons.delete_outline, color: AppColors.error),
+                onPressed: () => _confirmDeleteBangGia(context, item),
+                style: IconButton.styleFrom(
+                  backgroundColor: AppColors.error.withValues(alpha: 0.1),
+                  foregroundColor: AppColors.error,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
+    );
+  }
+
+  void _confirmDeleteBangGia(BuildContext context, BangGiaEntity item) {
+    AppConfirmDialog.show(
+      context: context,
+      title: 'Xác nhận xóa',
+      content: 'Bạn có chắc chắn muốn xóa bảng giá "${item.tenBangGia}"? Các phòng đang sử dụng bảng giá này sẽ trở về trạng thái chưa có bảng giá.',
+      confirmLabel: 'Xóa',
+      confirmColor: AppColors.error,
+      onConfirm: () {
+        context.read<BangGiaBloc>().add(XoaBangGiaRequested(
+              bangGiaId: item.id,
+              chuNhaId: chuNhaId,
+            ));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Đang xóa bảng giá...')),
+        );
+      },
     );
   }
 

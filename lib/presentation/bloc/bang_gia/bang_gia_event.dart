@@ -26,3 +26,22 @@ class ThemBangGiaRequested extends BangGiaEvent {
   @override
   List<Object?> get props => [bangGia, selectedPhongIds];
 }
+
+class XoaBangGiaRequested extends BangGiaEvent {
+  final String bangGiaId;
+  final String chuNhaId;
+
+  const XoaBangGiaRequested({required this.bangGiaId, required this.chuNhaId});
+
+  @override
+  List<Object?> get props => [bangGiaId, chuNhaId];
+}
+
+class UpdateBangGiaRequested extends BangGiaEvent {
+  final BangGiaEntity bangGia;
+
+  const UpdateBangGiaRequested(this.bangGia);
+
+  @override
+  List<Object?> get props => [bangGia];
+}

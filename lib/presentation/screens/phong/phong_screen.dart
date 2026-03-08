@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/phong/phong_bloc.dart';
+import '../../bloc/phong/phong_event.dart';
 import '../../bloc/phong/phong_state.dart';
+import '../../../domain/entities/nha_tro_entity.dart';
 import '../../widgets/empty_data_widget.dart';
+import '../../widgets/app_confirm_dialog.dart';
+import '../../../core/constants/app_colors.dart';
 import 'widgets/phong_card_widget.dart';
+import 'widgets/them_nha_tro_dialog.dart';
 
 class PhongScreen extends StatelessWidget {
   const PhongScreen({super.key});
@@ -97,13 +102,42 @@ class _NhaTroSection extends StatelessWidget {
               const Icon(Icons.home_outlined, size: 20),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  nhaTro.tenNhaTro,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      nhaTro.tenNhaTro,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                    ),
+                    Text(
+                      nhaTro.diaChi,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.textSecondary,
+                          ),
+                    ),
+                  ],
                 ),
               ),
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => _showThemNhaTroDialog(context, nhaTro: nhaTro),
+                icon: const Icon(Icons.edit_outlined, size: 18),
+                color: Theme.of(context).colorScheme.primary,
+                tooltip: 'Sửa nhà trọ',
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                onPressed: () => _confirmDeleteNhaTro(context, nhaTro),
+                icon: const Icon(Icons.delete_outline, size: 18),
+                color: Theme.of(context).colorScheme.error,
+                tooltip: 'Xóa nhà trọ',
+              ),
+              const SizedBox(width: 8),
               Text(
                 '${phongList.length} phòng',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -146,6 +180,40 @@ class _NhaTroSection extends StatelessWidget {
         const SizedBox(height: 16),
         const Divider(),
       ],
+    );
+  }
+
+  void _showThemNhaTroDialog(BuildContext context, {NhaTroEntity? nhaTro}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (bottomSheetContext) => BlocProvider.value(
+        value: context.read<PhongBloc>(),
+        child: DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          maxChildSize: 0.9,
+          minChildSize: 0.5,
+          expand: false,
+          builder: (_, controller) => ThemNhaTroDialog(
+            chuNhaId: nhaTro?.chuNhaId ?? '', // chuNhaId is effectively not needed if editing entity
+            initialNhaTro: nhaTro,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _confirmDeleteNhaTro(BuildContext context, NhaTroEntity nhaTro) {
+    AppConfirmDialog.show(
+      context: context,
+      title: 'Xóa nhà trọ',
+      content: 'Bạn có chắc chắn muốn xóa nhà trọ "${nhaTro.tenNhaTro}"? Hành động này sẽ XÓA TẤT CẢ các phòng thuộc nhà trọ này và không thể hoàn tác.',
+      confirmLabel: 'Xóa tất cả',
+      confirmColor: Theme.of(context).colorScheme.error,
+      onConfirm: () {
+        context.read<PhongBloc>().add(XoaNhaTroRequested(nhaTro.id));
+      },
     );
   }
 }

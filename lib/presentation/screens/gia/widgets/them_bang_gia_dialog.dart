@@ -17,10 +17,12 @@ import 'chon_phong_selection_dialog.dart';
 
 class ThemBangGiaDialog extends StatefulWidget {
   final String chuNhaId;
+  final BangGiaEntity? initialBangGia;
 
   const ThemBangGiaDialog({
     super.key,
     required this.chuNhaId,
+    this.initialBangGia,
   });
 
   @override
@@ -44,6 +46,25 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
   
   List<String> _selectedPhongIds = [];
 
+  bool get _isEditing => widget.initialBangGia != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isEditing) {
+      final bg = widget.initialBangGia!;
+      _tenController.text = bg.tenBangGia;
+      _giaThueController.text = CurrencyFormat.format(bg.giaThue);
+      _giaDienController.text = CurrencyFormat.format(bg.giaDien);
+      _cachTinhDien = bg.cachTinhDien;
+      _giaNuocController.text = CurrencyFormat.format(bg.giaNuoc);
+      _cachTinhNuoc = bg.cachTinhNuoc;
+      _giaInternetController.text = CurrencyFormat.format(bg.giaInternet);
+      _cachTinhInternet = bg.cachTinhInternet;
+      _chiPhiKhacController.text = bg.chiPhiKhac != null ? CurrencyFormat.format(bg.chiPhiKhac!) : '';
+      _ghiChuController.text = bg.ghiChu ?? '';
+    }
+  }
   @override
   void dispose() {
     _tenController.dispose();
@@ -60,7 +81,7 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
     if (!_formKey.currentState!.validate()) return;
 
     final entity = BangGiaEntity(
-      id: '', // Firestore will generate
+      id: _isEditing ? widget.initialBangGia!.id : '',
       tenBangGia: _tenController.text.trim(),
       chuNhaId: widget.chuNhaId,
       giaThue: CurrencyFormat.parse(_giaThueController.text.trim()),
@@ -74,10 +95,14 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
       ghiChu: _ghiChuController.text.trim().isEmpty ? null : _ghiChuController.text.trim(),
     );
 
-    context.read<BangGiaBloc>().add(ThemBangGiaRequested(
-          entity,
-          selectedPhongIds: _selectedPhongIds,
-        ));
+    if (_isEditing) {
+      context.read<BangGiaBloc>().add(UpdateBangGiaRequested(entity));
+    } else {
+      context.read<BangGiaBloc>().add(ThemBangGiaRequested(
+            entity,
+            selectedPhongIds: _selectedPhongIds,
+          ));
+    }
   }
 
   void _onTapChonPhong() async {
@@ -112,7 +137,7 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
       listener: (context, state) {
         if (state is ThemBangGiaSuccess) {
           Navigator.of(context).pop();
-          AppSnackBar.showSuccess(context, 'Thêm bảng giá thành công!');
+          AppSnackBar.showSuccess(context, _isEditing ? 'Cập nhật bảng giá thành công!' : 'Thêm bảng giá thành công!');
         } else if (state is ThemBangGiaFailure) {
           AppSnackBar.showError(context, 'Lỗi: ${state.message}');
         }
@@ -145,9 +170,9 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Thêm bảng giá mới',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      Text(
+                        _isEditing ? 'Sửa bảng giá' : 'Thêm bảng giá mới',
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       IconButton(
                         icon: const Icon(Icons.close),
@@ -211,25 +236,27 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
                           AppTextField(controller: _ghiChuController, label: 'Ghi chú chi phí', hint: 'VD: Rác, vệ sinh...', isLoading: isLoading, isRequired: false),
                           const Divider(height: 32),
                           
-                          // Chọn phòng
-                          ListTile(
-                            contentPadding: EdgeInsets.zero,
-                            title: const Text('Áp dụng cho phòng', style: TextStyle(fontWeight: FontWeight.bold)),
-                            subtitle: Text(_selectedPhongIds.isEmpty ? 'Chưa chọn phòng nào' : 'Đã chọn ${_selectedPhongIds.length} phòng'),
-                            trailing: TextButton.icon(
-                              onPressed: isLoading ? null : _onTapChonPhong,
-                              icon: const Icon(Icons.add_circle_outline, size: 20),
-                              label: Text(_selectedPhongIds.isEmpty ? 'Chọn phòng' : 'Thay đổi'),
-                            ),
-                          ),
-                          if (_selectedPhongIds.isNotEmpty)
-                            const Padding(
-                              padding: EdgeInsets.only(top: 8),
-                              child: Text(
-                                'Bảng giá này sẽ được áp dụng ngay cho các phòng đã chọn sau khi lưu.',
-                                style: TextStyle(fontSize: 12, color: Colors.grey, fontStyle: FontStyle.italic),
+                          if (!_isEditing) ...[
+                            // Chọn phòng
+                            ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              title: const Text('Áp dụng cho phòng', style: TextStyle(fontWeight: FontWeight.bold)),
+                              subtitle: Text(_selectedPhongIds.isEmpty ? 'Chưa chọn phòng nào' : 'Đã chọn ${_selectedPhongIds.length} phòng'),
+                              trailing: TextButton.icon(
+                                onPressed: isLoading ? null : _onTapChonPhong,
+                                icon: const Icon(Icons.add_circle_outline, size: 20),
+                                label: Text(_selectedPhongIds.isEmpty ? 'Chọn phòng' : 'Thay đổi'),
                               ),
                             ),
+                            if (_selectedPhongIds.isNotEmpty)
+                              const Padding(
+                                padding: EdgeInsets.only(top: 8),
+                                child: Text(
+                                  'Bảng giá này sẽ được áp dụng ngay cho các phòng đã chọn sau khi lưu.',
+                                  style: TextStyle(fontSize: 12, color: Colors.grey, fontStyle: FontStyle.italic),
+                                ),
+                              ),
+                          ],
                           const SizedBox(height: 16),
                         ],
                       ),

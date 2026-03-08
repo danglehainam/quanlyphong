@@ -2,6 +2,7 @@ import '../../domain/entities/nha_tro_entity.dart';
 import '../../domain/entities/phong_entity.dart';
 import '../../domain/repositories/phong_repository.dart';
 import '../datasources/remote/phong_remote_data_source.dart';
+import '../models/nha_tro_model.dart';
 
 class PhongRepositoryImpl implements PhongRepository {
   final PhongRemoteDataSource remoteDataSource;
@@ -37,5 +38,18 @@ class PhongRepositoryImpl implements PhongRepository {
   @override
   Future<void> updateBangGiaChoPhongList(List<String> phongIds, String bangGiaId) async {
     return remoteDataSource.updateBangGiaChoPhongList(phongIds, bangGiaId);
+  }
+  @override
+  Future<void> xoaBangGiaKhoiTatCaPhong(String bangGiaId, String chuNhaId) async {
+    return remoteDataSource.xoaBangGiaKhoiTatCaPhong(bangGiaId, chuNhaId);
+  }
+  @override
+  Future<void> updateNhaTro(NhaTroEntity nhaTro) {
+    return remoteDataSource.updateNhaTro(NhaTroModel.fromEntity(nhaTro));
+  }
+
+  @override
+  Future<void> deleteNhaTroWithPhong(String nhaTroId) {
+    return remoteDataSource.deleteNhaTroWithPhong(nhaTroId);
   }
 }

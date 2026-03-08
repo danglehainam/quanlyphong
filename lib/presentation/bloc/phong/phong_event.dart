@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../../domain/entities/nha_tro_entity.dart';
 
 abstract class PhongEvent extends Equatable {
   const PhongEvent();
@@ -31,4 +32,22 @@ class ThemNhaTroRequested extends PhongEvent {
 
   @override
   List<Object?> get props => [tenNhaTro, diaChi, soLuongPhong, chuNhaId];
+}
+
+class UpdateNhaTroRequested extends PhongEvent {
+  final NhaTroEntity nhaTro;
+
+  const UpdateNhaTroRequested(this.nhaTro);
+
+  @override
+  List<Object?> get props => [nhaTro];
+}
+
+class XoaNhaTroRequested extends PhongEvent {
+  final String nhaTroId;
+
+  const XoaNhaTroRequested(this.nhaTroId);
+
+  @override
+  List<Object?> get props => [nhaTroId];
 }

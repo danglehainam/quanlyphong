@@ -7,11 +7,15 @@ import '../../../domain/entities/phong_entity.dart';
 import '../../../domain/usecases/watch_nha_tro_list.dart';
 import '../../../domain/usecases/watch_phong_list.dart';
 import '../../../domain/usecases/them_nha_tro.dart';
+import '../../../domain/usecases/update_nha_tro.dart';
+import '../../../domain/usecases/xoa_nha_tro.dart';
 
 class PhongBloc extends Bloc<PhongEvent, PhongState> {
   final WatchNhaTroListUseCase _watchNhaTroList;
   final WatchPhongListUseCase _watchPhongList;
   final ThemNhaTroUseCase _themNhaTroUseCase;
+  final UpdateNhaTroUseCase _updateNhaTroUseCase;
+  final XoaNhaTroUseCase _xoaNhaTroUseCase;
 
   StreamSubscription? _nhaTroSub;
   final Map<String, StreamSubscription> _phongSubs = {};
@@ -22,12 +26,18 @@ class PhongBloc extends Bloc<PhongEvent, PhongState> {
     required WatchNhaTroListUseCase watchNhaTroList,
     required WatchPhongListUseCase watchPhongList,
     required ThemNhaTroUseCase themNhaTroUseCase,
+    required UpdateNhaTroUseCase updateNhaTroUseCase,
+    required XoaNhaTroUseCase xoaNhaTroUseCase,
   })  : _watchNhaTroList = watchNhaTroList,
         _watchPhongList = watchPhongList,
         _themNhaTroUseCase = themNhaTroUseCase,
+        _updateNhaTroUseCase = updateNhaTroUseCase,
+        _xoaNhaTroUseCase = xoaNhaTroUseCase,
         super(PhongInitial()) {
     on<PhongStarted>(_onPhongStarted);
     on<ThemNhaTroRequested>(_onThemNhaTroRequested);
+    on<UpdateNhaTroRequested>(_onUpdateNhaTroRequested);
+    on<XoaNhaTroRequested>(_onXoaNhaTroRequested);
     on<_PhongDataUpdated>((event, emit) {
       if (_nhaTroList.isNotEmpty) {
         emit(_buildLoaded());
@@ -100,6 +110,29 @@ class PhongBloc extends Bloc<PhongEvent, PhongState> {
       if (previousState is PhongLoaded) {
         emit(previousState);
       }
+    }
+  }
+
+  Future<void> _onUpdateNhaTroRequested(
+      UpdateNhaTroRequested event, Emitter<PhongState> emit) async {
+    final previousState = state;
+    emit(ThemNhaTroLoading()); // Reuse loading state
+    try {
+      await _updateNhaTroUseCase(event.nhaTro);
+      emit(ThemNhaTroSuccess());
+      if (previousState is PhongLoaded) emit(previousState);
+    } catch (e) {
+      emit(ThemNhaTroFailure(e.toString()));
+      if (previousState is PhongLoaded) emit(previousState);
+    }
+  }
+
+  Future<void> _onXoaNhaTroRequested(
+      XoaNhaTroRequested event, Emitter<PhongState> emit) async {
+    try {
+      await _xoaNhaTroUseCase(event.nhaTroId);
+    } catch (e) {
+      emit(PhongError(e.toString()));
     }
   }
 

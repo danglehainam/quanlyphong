@@ -21,10 +21,14 @@ import '../../domain/usecases/save_user_if_new.dart';
 import '../../domain/usecases/watch_nha_tro_list.dart';
 import '../../domain/usecases/watch_phong_list.dart';
 import '../../domain/usecases/them_nha_tro.dart';
+import '../../domain/usecases/update_nha_tro.dart';
+import '../../domain/usecases/xoa_nha_tro.dart';
 import '../../domain/usecases/watch_bang_gia_list.dart';
 import '../../domain/usecases/them_bang_gia.dart';
 import '../../domain/usecases/watch_tat_ca_phong.dart';
 import '../../domain/usecases/update_bang_gia_cho_phong_list.dart';
+import '../../domain/usecases/xoa_bang_gia.dart';
+import '../../domain/usecases/update_bang_gia.dart';
 import '../../presentation/bloc/auth/auth_bloc.dart';
 import '../../presentation/bloc/phong/phong_bloc.dart';
 import '../../presentation/bloc/bang_gia/bang_gia_bloc.dart';
@@ -54,10 +58,17 @@ Future<void> init() async {
   serviceLocator.registerLazySingleton(() => WatchNhaTroListUseCase(serviceLocator()));
   serviceLocator.registerLazySingleton(() => WatchPhongListUseCase(serviceLocator()));
   serviceLocator.registerLazySingleton(() => ThemNhaTroUseCase(serviceLocator()));
+  serviceLocator.registerLazySingleton(() => UpdateNhaTroUseCase(serviceLocator()));
+  serviceLocator.registerLazySingleton(() => XoaNhaTroUseCase(serviceLocator()));
   serviceLocator.registerLazySingleton(() => WatchBangGiaListUseCase(serviceLocator()));
   serviceLocator.registerLazySingleton(() => ThemBangGiaUseCase(serviceLocator()));
   serviceLocator.registerLazySingleton(() => WatchTatCaPhongUseCase(serviceLocator()));
   serviceLocator.registerLazySingleton(() => UpdateBangGiaChoPhongListUseCase(serviceLocator()));
+  serviceLocator.registerLazySingleton(() => UpdateBangGiaUseCase(serviceLocator()));
+  serviceLocator.registerLazySingleton(() => XoaBangGiaUseCase(
+        bangGiaRepository: serviceLocator(),
+        phongRepository: serviceLocator(),
+      ));
 
   // 3. Blocs
   serviceLocator.registerFactory(() => AuthBloc(
@@ -71,12 +82,16 @@ Future<void> init() async {
         watchNhaTroList: serviceLocator(),
         watchPhongList: serviceLocator(),
         themNhaTroUseCase: serviceLocator(),
+        updateNhaTroUseCase: serviceLocator(),
+        xoaNhaTroUseCase: serviceLocator(),
       ));
 
   serviceLocator.registerFactory(() => BangGiaBloc(
         watchBangGiaListUseCase: serviceLocator(),
         themBangGiaUseCase: serviceLocator(),
         updateBangGiaChoPhongListUseCase: serviceLocator(),
+        xoaBangGiaUseCase: serviceLocator(),
+        updateBangGiaUseCase: serviceLocator(),
       ));
 
   serviceLocator.registerFactory(() => ApDungBangGiaBloc(

@@ -7,7 +7,10 @@ abstract class PhongRemoteDataSource {
   Stream<List<PhongModel>> watchTatCaPhong(String chuNhaId);
   Stream<List<PhongModel>> watchPhongByNhaTro(String nhaTroId, String chuNhaId);
   Future<void> createNhaTroWithPhong(String tenNhaTro, String diaChi, int soLuongPhong, String chuNhaId);
+  Future<void> updateNhaTro(NhaTroModel nhaTro);
+  Future<void> deleteNhaTroWithPhong(String nhaTroId);
   Future<void> updateBangGiaChoPhongList(List<String> phongIds, String bangGiaId);
+  Future<void> xoaBangGiaKhoiTatCaPhong(String bangGiaId, String chuNhaId);
 }
 
 class PhongRemoteDataSourceImpl implements PhongRemoteDataSource {
@@ -107,6 +110,49 @@ class PhongRemoteDataSourceImpl implements PhongRemoteDataSource {
       batch.update(docRef, {'bangGiaId': bangGiaId});
     }
 
+    await batch.commit();
+  }
+
+  @override
+  Future<void> xoaBangGiaKhoiTatCaPhong(String bangGiaId, String chuNhaId) async {
+    final snapshot = await _firestore
+        .collection('phong')
+        .where('chuNhaId', isEqualTo: chuNhaId)
+        .where('bangGiaId', isEqualTo: bangGiaId)
+        .get();
+
+    if (snapshot.docs.isEmpty) return;
+
+    final batch = _firestore.batch();
+    for (final doc in snapshot.docs) {
+      batch.update(doc.reference, {'bangGiaId': FieldValue.delete()});
+    }
+
+    await batch.commit();
+  }
+
+  @override
+  Future<void> updateNhaTro(NhaTroModel nhaTro) {
+    return _firestore.collection('nha_tro').doc(nhaTro.id).update(nhaTro.toFirestore());
+  }
+
+  @override
+  Future<void> deleteNhaTroWithPhong(String nhaTroId) async {
+    final batch = _firestore.batch();
+    
+    // 1. Xóa nhà trọ
+    batch.delete(_firestore.collection('nha_tro').doc(nhaTroId));
+    
+    // 2. Tìm và xóa tất cả phòng thuộc nhà trọ này
+    final phongSnapshot = await _firestore
+        .collection('phong')
+        .where('nhaTroId', isEqualTo: nhaTroId)
+        .get();
+        
+    for (final doc in phongSnapshot.docs) {
+      batch.delete(doc.reference);
+    }
+    
     await batch.commit();
   }
 }

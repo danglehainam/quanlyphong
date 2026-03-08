@@ -20,4 +20,13 @@ class BangGiaRepositoryImpl implements BangGiaRepository {
     final model = BangGiaModel.fromEntity(bangGia);
     return remoteDataSource.themBangGia(model);
   }
+  @override
+  Future<void> xoaBangGia(String id) {
+    return remoteDataSource.xoaBangGia(id);
+  }
+
+  @override
+  Future<void> updateBangGia(BangGiaEntity bangGia) {
+    return remoteDataSource.updateBangGia(BangGiaModel.fromEntity(bangGia));
+  }
 }

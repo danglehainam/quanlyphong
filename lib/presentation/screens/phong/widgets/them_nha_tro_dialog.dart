@@ -7,12 +7,16 @@ import '../../../widgets/app_text_field.dart';
 import '../../../widgets/app_dialog_actions.dart';
 import '../../../widgets/app_snackbar.dart';
 
+import '../../../../domain/entities/nha_tro_entity.dart';
+
 class ThemNhaTroDialog extends StatefulWidget {
   final String chuNhaId;
+  final NhaTroEntity? initialNhaTro;
 
   const ThemNhaTroDialog({
     super.key,
     required this.chuNhaId,
+    this.initialNhaTro,
   });
 
   @override
@@ -25,6 +29,17 @@ class _ThemNhaTroDialogState extends State<ThemNhaTroDialog> {
   final _diaChiController = TextEditingController();
   final _soLuongPhongController = TextEditingController(text: '1');
 
+  bool get _isEditing => widget.initialNhaTro != null;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_isEditing) {
+      _tenNhaTroController.text = widget.initialNhaTro!.tenNhaTro;
+      _diaChiController.text = widget.initialNhaTro!.diaChi;
+    }
+  }
+
   @override
   void dispose() {
     _tenNhaTroController.dispose();
@@ -36,12 +51,20 @@ class _ThemNhaTroDialogState extends State<ThemNhaTroDialog> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    context.read<PhongBloc>().add(ThemNhaTroRequested(
-          tenNhaTro: _tenNhaTroController.text.trim(),
-          diaChi: _diaChiController.text.trim(),
-          soLuongPhong: int.parse(_soLuongPhongController.text.trim()),
-          chuNhaId: widget.chuNhaId,
-        ));
+    if (_isEditing) {
+      final updatedNhaTro = widget.initialNhaTro!.copyWith(
+        tenNhaTro: _tenNhaTroController.text.trim(),
+        diaChi: _diaChiController.text.trim(),
+      );
+      context.read<PhongBloc>().add(UpdateNhaTroRequested(updatedNhaTro));
+    } else {
+      context.read<PhongBloc>().add(ThemNhaTroRequested(
+            tenNhaTro: _tenNhaTroController.text.trim(),
+            diaChi: _diaChiController.text.trim(),
+            soLuongPhong: int.parse(_soLuongPhongController.text.trim()),
+            chuNhaId: widget.chuNhaId,
+          ));
+    }
   }
 
   @override
@@ -50,7 +73,7 @@ class _ThemNhaTroDialogState extends State<ThemNhaTroDialog> {
       listener: (context, state) {
         if (state is ThemNhaTroSuccess) {
           Navigator.of(context).pop();
-          AppSnackBar.showSuccess(context, 'Tạo nhà trọ và các phòng thành công!');
+          AppSnackBar.showSuccess(context, _isEditing ? 'Cập nhật nhà trọ thành công!' : 'Tạo nhà trọ và các phòng thành công!');
         } else if (state is ThemNhaTroFailure) {
           AppSnackBar.showError(context, 'Lỗi: ${state.message}');
         }
@@ -83,9 +106,9 @@ class _ThemNhaTroDialogState extends State<ThemNhaTroDialog> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Thêm nhà trọ mới',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      Text(
+                        _isEditing ? 'Sửa thông tin nhà trọ' : 'Thêm nhà trọ mới',
+                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       IconButton(
                         icon: const Icon(Icons.close),
@@ -115,13 +138,14 @@ class _ThemNhaTroDialogState extends State<ThemNhaTroDialog> {
                             hint: 'Nhập địa chỉ...',
                             isLoading: isBlocLoading,
                           ),
-                          AppTextField(
-                            controller: _soLuongPhongController,
-                            label: 'Số lượng phòng',
-                            hint: '1',
-                            isLoading: isBlocLoading,
-                            isNumber: true,
-                          ),
+                          if (!_isEditing)
+                            AppTextField(
+                              controller: _soLuongPhongController,
+                              label: 'Số lượng phòng',
+                              hint: '1',
+                              isLoading: isBlocLoading,
+                              isNumber: true,
+                            ),
                           const SizedBox(height: 24),
                         ],
                       ),
@@ -136,7 +160,7 @@ class _ThemNhaTroDialogState extends State<ThemNhaTroDialog> {
                       isLoading: isBlocLoading,
                       onCancel: () => Navigator.of(context).pop(),
                       onSubmit: _submit,
-                      submitLabel: 'Tạo mới',
+                      submitLabel: _isEditing ? 'Cập nhật' : 'Tạo mới',
                     ),
                   ),
                 ),

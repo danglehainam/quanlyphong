@@ -86,69 +86,112 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
         builder: (context, state) {
           final isLoading = state is ThemBangGiaLoading;
 
-          return AlertDialog(
-            title: const Text('Thêm bảng giá mới'),
-            content: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    AppTextField(controller: _tenController, label: 'Tên bảng giá', hint: 'VD: Giá sinh viên...', isLoading: isLoading),
-                    AppTextField(controller: _giaThueController, label: 'Giá thuê (VND/tháng)', hint: 'VND...', isLoading: isLoading, isCurrency: true),
-                    const Divider(height: 32),
-                    const AppSectionHeader(title: 'Tiền Điện'),
-                    AppTextField(controller: _giaDienController, label: 'Mức giá điện', hint: 'VND...', isLoading: isLoading, isCurrency: true),
-                    AppDropdownField<int>(
-                      label: 'Cách tính điện',
-                      value: _cachTinhDien,
-                      items: const [
-                        DropdownMenuItem(value: 0, child: Text('VND / số (kWh)')),
-                        DropdownMenuItem(value: 1, child: Text('VND / người')),
-                        DropdownMenuItem(value: 2, child: Text('Tự nhập')),
-                      ],
-                      onChanged: (val) => setState(() => _cachTinhDien = val!),
-                    ),
-                    const Divider(height: 32),
-                    const AppSectionHeader(title: 'Tiền Nước'),
-                    AppTextField(controller: _giaNuocController, label: 'Mức giá nước', hint: 'VND...', isLoading: isLoading, isCurrency: true),
-                    AppDropdownField<int>(
-                      label: 'Cách tính nước',
-                      value: _cachTinhNuoc,
-                      items: const [
-                        DropdownMenuItem(value: 0, child: Text('VND / khối (m³)')),
-                        DropdownMenuItem(value: 1, child: Text('VND / người')),
-                        DropdownMenuItem(value: 2, child: Text('Tự nhập')),
-                      ],
-                      onChanged: (val) => setState(() => _cachTinhNuoc = val!),
-                    ),
-                    const Divider(height: 32),
-                    const AppSectionHeader(title: 'Internet'),
-                    AppTextField(controller: _giaInternetController, label: 'Mức giá internet', hint: 'VND...', isLoading: isLoading, isCurrency: true),
-                    AppDropdownField<int>(
-                      label: 'Cách tính internet',
-                      value: _cachTinhInternet,
-                      items: const [
-                        DropdownMenuItem(value: 0, child: Text('VND / phòng')),
-                        DropdownMenuItem(value: 1, child: Text('VND / người')),
-                      ],
-                      onChanged: (val) => setState(() => _cachTinhInternet = val!),
-                    ),
-                    const Divider(height: 32),
-                    const AppSectionHeader(title: 'Chi phí khác'),
-                    AppTextField(controller: _chiPhiKhacController, label: 'Số tiền (không bắt buộc)', hint: 'VND...', isLoading: isLoading, isCurrency: true, isRequired: false),
-                    AppTextField(controller: _ghiChuController, label: 'Ghi chú chi phí', hint: 'VD: Rác, vệ sinh...', isLoading: isLoading, isRequired: false),
-                  ],
-                ),
-              ),
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
-            actions: [
-              AppDialogActions(
-                isLoading: isLoading,
-                onCancel: () => Navigator.pop(context),
-                onSubmit: _submit,
-              ),
-            ],
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle bar
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  height: 4,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                // Header
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Thêm bảng giá mới',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(),
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AppTextField(controller: _tenController, label: 'Tên bảng giá', hint: 'VD: Giá sinh viên...', isLoading: isLoading),
+                          AppTextField(controller: _giaThueController, label: 'Giá thuê (VND/tháng)', hint: 'VND...', isLoading: isLoading, isCurrency: true),
+                          const Divider(height: 32),
+                          const AppSectionHeader(title: 'Tiền Điện'),
+                          AppTextField(controller: _giaDienController, label: 'Mức giá điện', hint: 'VND...', isLoading: isLoading, isCurrency: true),
+                          AppDropdownField<int>(
+                            label: 'Cách tính điện',
+                            value: _cachTinhDien,
+                            items: const [
+                              DropdownMenuItem(value: 0, child: Text('VND / số (kWh)')),
+                              DropdownMenuItem(value: 1, child: Text('VND / người')),
+                              DropdownMenuItem(value: 2, child: Text('Tự nhập')),
+                            ],
+                            onChanged: (val) => setState(() => _cachTinhDien = val!),
+                          ),
+                          const Divider(height: 32),
+                          const AppSectionHeader(title: 'Tiền Nước'),
+                          AppTextField(controller: _giaNuocController, label: 'Mức giá nước', hint: 'VND...', isLoading: isLoading, isCurrency: true),
+                          AppDropdownField<int>(
+                            label: 'Cách tính nước',
+                            value: _cachTinhNuoc,
+                            items: const [
+                              DropdownMenuItem(value: 0, child: Text('VND / khối (m³)')),
+                              DropdownMenuItem(value: 1, child: Text('VND / người')),
+                              DropdownMenuItem(value: 2, child: Text('Tự nhập')),
+                            ],
+                            onChanged: (val) => setState(() => _cachTinhNuoc = val!),
+                          ),
+                          const Divider(height: 32),
+                          const AppSectionHeader(title: 'Internet'),
+                          AppTextField(controller: _giaInternetController, label: 'Mức giá internet', hint: 'VND...', isLoading: isLoading, isCurrency: true),
+                          AppDropdownField<int>(
+                            label: 'Cách tính internet',
+                            value: _cachTinhInternet,
+                            items: const [
+                              DropdownMenuItem(value: 0, child: Text('VND / phòng')),
+                              DropdownMenuItem(value: 1, child: Text('VND / người')),
+                            ],
+                            onChanged: (val) => setState(() => _cachTinhInternet = val!),
+                          ),
+                          const Divider(height: 32),
+                          const AppSectionHeader(title: 'Chi phí khác'),
+                          AppTextField(controller: _chiPhiKhacController, label: 'Số tiền (không bắt buộc)', hint: 'VND...', isLoading: isLoading, isCurrency: true, isRequired: false),
+                          AppTextField(controller: _ghiChuController, label: 'Ghi chú chi phí', hint: 'VD: Rác, vệ sinh...', isLoading: isLoading, isRequired: false),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Footer Actions
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: AppDialogActions(
+                      isLoading: isLoading,
+                      onCancel: () => Navigator.pop(context),
+                      onSubmit: _submit,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),

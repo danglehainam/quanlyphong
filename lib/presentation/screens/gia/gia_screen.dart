@@ -9,7 +9,10 @@ import '../../bloc/bang_gia/bang_gia_state.dart';
 import '../../widgets/app_bar_add_button.dart';
 import '../../widgets/empty_data_widget.dart';
 import '../../../core/utils/currency_format.dart';
+import '../../bloc/ap_dung_bang_gia/ap_dung_bang_gia_bloc.dart';
+import '../../bloc/ap_dung_bang_gia/ap_dung_bang_gia_event.dart';
 import 'widgets/them_bang_gia_dialog.dart';
+import 'widgets/ap_dung_bang_gia_dialog.dart';
 
 class GiaScreen extends StatelessWidget {
   final String chuNhaId;
@@ -20,12 +23,36 @@ class GiaScreen extends StatelessWidget {
   });
 
   void _showThemBangGiaDialog(BuildContext context) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => BlocProvider.value(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (bottomSheetContext) => BlocProvider.value(
         value: context.read<BangGiaBloc>(),
-        child: ThemBangGiaDialog(chuNhaId: chuNhaId),
+        child: DraggableScrollableSheet(
+          initialChildSize: 0.9,
+          maxChildSize: 0.9,
+          minChildSize: 0.5,
+          expand: false,
+          builder: (_, controller) => ThemBangGiaDialog(chuNhaId: chuNhaId),
+        ),
+      ),
+    );
+  }
+
+  void _showApDungBangGiaDialog(BuildContext context, String bangGiaId) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (bottomSheetContext) => BlocProvider(
+        create: (context) => serviceLocator<ApDungBangGiaBloc>()..add(ApDungBangGiaStarted(chuNhaId)),
+        child: DraggableScrollableSheet(
+          initialChildSize: 0.8,
+          maxChildSize: 0.9,
+          minChildSize: 0.5,
+          builder: (_, controller) => ApDungBangGiaDialog(bangGiaId: bangGiaId),
+        ),
       ),
     );
   }
@@ -76,7 +103,7 @@ class GiaScreen extends StatelessWidget {
         itemCount: state.items.length,
         itemBuilder: (context, index) {
           final item = state.items[index];
-          return _buildBangGiaCard(item);
+          return _buildBangGiaCard(context, item);
         },
       );
     }
@@ -84,7 +111,7 @@ class GiaScreen extends StatelessWidget {
     return const SizedBox.shrink();
   }
 
-  Widget _buildBangGiaCard(BangGiaEntity item) {
+  Widget _buildBangGiaCard(BuildContext context, BangGiaEntity item) {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 16),
@@ -103,6 +130,20 @@ class GiaScreen extends StatelessWidget {
           _buildInfoRow(Icons.wifi, 'Internet:', '${CurrencyFormat.format(item.giaInternet)} VND (${item.cachTinhInternet == 0 ? "phòng" : "người"})'),
           if (item.chiPhiKhac != null)
             _buildInfoRow(Icons.more_horiz, 'Khác:', '${CurrencyFormat.format(item.chiPhiKhac!)} VND (${item.ghiChu ?? "Không có ghi chú"})'),
+          const SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              icon: const Icon(Icons.check_circle_outline),
+              label: const Text('Áp dụng cho phòng'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+              onPressed: () => _showApDungBangGiaDialog(context, item.id),
+            ),
+          )
         ],
       ),
     );

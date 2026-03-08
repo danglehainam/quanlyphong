@@ -16,6 +16,13 @@ class PhongRepositoryImpl implements PhongRepository {
   }
 
   @override
+  Stream<List<PhongEntity>> watchTatCaPhong(String chuNhaId) {
+    return remoteDataSource
+        .watchTatCaPhong(chuNhaId)
+        .map((models) => models.map((model) => model.toEntity()).toList());
+  }
+
+  @override
   Stream<List<PhongEntity>> watchPhongByNhaTro(String nhaTroId, String chuNhaId) {
     return remoteDataSource
         .watchPhongByNhaTro(nhaTroId, chuNhaId)
@@ -25,5 +32,10 @@ class PhongRepositoryImpl implements PhongRepository {
   @override
   Future<void> createNhaTroWithPhong(String tenNhaTro, String diaChi, int soLuongPhong, String chuNhaId) async {
     return remoteDataSource.createNhaTroWithPhong(tenNhaTro, diaChi, soLuongPhong, chuNhaId);
+  }
+
+  @override
+  Future<void> updateBangGiaChoPhongList(List<String> phongIds, String bangGiaId) async {
+    return remoteDataSource.updateBangGiaChoPhongList(phongIds, bangGiaId);
   }
 }

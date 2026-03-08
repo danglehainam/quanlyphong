@@ -23,9 +23,12 @@ import '../../domain/usecases/watch_phong_list.dart';
 import '../../domain/usecases/them_nha_tro.dart';
 import '../../domain/usecases/watch_bang_gia_list.dart';
 import '../../domain/usecases/them_bang_gia.dart';
+import '../../domain/usecases/watch_tat_ca_phong.dart';
+import '../../domain/usecases/update_bang_gia_cho_phong_list.dart';
 import '../../presentation/bloc/auth/auth_bloc.dart';
 import '../../presentation/bloc/phong/phong_bloc.dart';
 import '../../presentation/bloc/bang_gia/bang_gia_bloc.dart';
+import '../../presentation/bloc/ap_dung_bang_gia/ap_dung_bang_gia_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 final serviceLocator = GetIt.instance;
@@ -53,6 +56,8 @@ Future<void> init() async {
   serviceLocator.registerLazySingleton(() => ThemNhaTroUseCase(serviceLocator()));
   serviceLocator.registerLazySingleton(() => WatchBangGiaListUseCase(serviceLocator()));
   serviceLocator.registerLazySingleton(() => ThemBangGiaUseCase(serviceLocator()));
+  serviceLocator.registerLazySingleton(() => WatchTatCaPhongUseCase(serviceLocator()));
+  serviceLocator.registerLazySingleton(() => UpdateBangGiaChoPhongListUseCase(serviceLocator()));
 
   // 3. Blocs
   serviceLocator.registerFactory(() => AuthBloc(
@@ -71,5 +76,11 @@ Future<void> init() async {
   serviceLocator.registerFactory(() => BangGiaBloc(
         watchBangGiaListUseCase: serviceLocator(),
         themBangGiaUseCase: serviceLocator(),
+      ));
+
+  serviceLocator.registerFactory(() => ApDungBangGiaBloc(
+        watchNhaTroList: serviceLocator(),
+        watchTatCaPhong: serviceLocator(),
+        updateBangGiaChoPhongList: serviceLocator(),
       ));
 }

@@ -46,13 +46,20 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _showThemNhaTroDialog(BuildContext context) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => BlocProvider.value(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (bottomSheetContext) => BlocProvider.value(
         value: context.read<PhongBloc>(),
-        child: ThemNhaTroDialog(
-          chuNhaId: widget.user.uid,
+        child: DraggableScrollableSheet(
+          initialChildSize: 0.6,
+          maxChildSize: 0.9,
+          minChildSize: 0.4,
+          expand: false,
+          builder: (_, controller) => ThemNhaTroDialog(
+            chuNhaId: widget.user.uid,
+          ),
         ),
       ),
     );

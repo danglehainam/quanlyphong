@@ -59,45 +59,89 @@ class _ThemNhaTroDialogState extends State<ThemNhaTroDialog> {
         builder: (context, state) {
           final isBlocLoading = state is ThemNhaTroLoading;
           
-          return AlertDialog(
-            title: const Text('Thêm nhà trọ mới'),
-            content: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    AppTextField(
-                      controller: _tenNhaTroController,
-                      label: 'Tên nhà trọ',
-                      hint: 'VD: Trọ Sinh Viên...',
-                      isLoading: isBlocLoading,
-                    ),
-                    AppTextField(
-                      controller: _diaChiController,
-                      label: 'Địa chỉ',
-                      hint: 'Nhập địa chỉ...',
-                      isLoading: isBlocLoading,
-                    ),
-                    AppTextField(
-                      controller: _soLuongPhongController,
-                      label: 'Số lượng phòng',
-                      hint: '1',
-                      isLoading: isBlocLoading,
-                      isNumber: true,
-                    ),
-                  ],
-                ),
-              ),
+          return Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
             ),
-            actions: [
-              AppDialogActions(
-                isLoading: isBlocLoading,
-                onCancel: () => Navigator.of(context).pop(),
-                onSubmit: _submit,
-                submitLabel: 'Tạo mới',
-              ),
-            ],
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Handle bar for dragging
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  height: 4,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                // Header
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Thêm nhà trọ mới',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(),
+                Flexible(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AppTextField(
+                            controller: _tenNhaTroController,
+                            label: 'Tên nhà trọ',
+                            hint: 'VD: Trọ Sinh Viên...',
+                            isLoading: isBlocLoading,
+                          ),
+                          AppTextField(
+                            controller: _diaChiController,
+                            label: 'Địa chỉ',
+                            hint: 'Nhập địa chỉ...',
+                            isLoading: isBlocLoading,
+                          ),
+                          AppTextField(
+                            controller: _soLuongPhongController,
+                            label: 'Số lượng phòng',
+                            hint: '1',
+                            isLoading: isBlocLoading,
+                            isNumber: true,
+                          ),
+                          const SizedBox(height: 24),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                // Footer Actions
+                SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: AppDialogActions(
+                      isLoading: isBlocLoading,
+                      onCancel: () => Navigator.of(context).pop(),
+                      onSubmit: _submit,
+                      submitLabel: 'Tạo mới',
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),

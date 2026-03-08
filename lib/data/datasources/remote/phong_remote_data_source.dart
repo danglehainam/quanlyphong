@@ -4,8 +4,10 @@ import '../../models/phong_model.dart';
 
 abstract class PhongRemoteDataSource {
   Stream<List<NhaTroModel>> watchNhaTroList(String chuNhaId);
+  Stream<List<PhongModel>> watchTatCaPhong(String chuNhaId);
   Stream<List<PhongModel>> watchPhongByNhaTro(String nhaTroId, String chuNhaId);
   Future<void> createNhaTroWithPhong(String tenNhaTro, String diaChi, int soLuongPhong, String chuNhaId);
+  Future<void> updateBangGiaChoPhongList(List<String> phongIds, String bangGiaId);
 }
 
 class PhongRemoteDataSourceImpl implements PhongRemoteDataSource {
@@ -23,6 +25,24 @@ class PhongRemoteDataSourceImpl implements PhongRemoteDataSource {
         .map((snapshot) => snapshot.docs.map((doc) {
               return NhaTroModel.fromFirestore(doc);
             }).toList());
+  }
+
+  @override
+  Stream<List<PhongModel>> watchTatCaPhong(String chuNhaId) {
+    return _firestore
+        .collection('phong')
+        .where('chuNhaId', isEqualTo: chuNhaId)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              return PhongModel.fromFirestore(doc);
+            }).toList()..sort((a, b) {
+              final numA = int.tryParse(a.tenPhong);
+              final numB = int.tryParse(b.tenPhong);
+              if (numA != null && numB != null) {
+                return numA.compareTo(numB);
+              }
+              return a.tenPhong.compareTo(b.tenPhong);
+            }));
   }
 
   @override
@@ -74,6 +94,19 @@ class PhongRemoteDataSourceImpl implements PhongRemoteDataSource {
     }
 
     // Thực thi batch
+    await batch.commit();
+  }
+
+  @override
+  Future<void> updateBangGiaChoPhongList(List<String> phongIds, String bangGiaId) async {
+    if (phongIds.isEmpty) return;
+
+    final batch = _firestore.batch();
+    for (final id in phongIds) {
+      final docRef = _firestore.collection('phong').doc(id);
+      batch.update(docRef, {'bangGiaId': bangGiaId});
+    }
+
     await batch.commit();
   }
 }

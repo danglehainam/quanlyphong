@@ -3,7 +3,7 @@ import '../../models/nguoi_thue_model.dart';
 
 abstract class NguoiThueRemoteDataSource {
   Stream<List<NguoiThueModel>> watchNguoiThueList(String chuNhaId);
-  Future<void> themNguoiThue(NguoiThueModel nguoiThue);
+  Future<String> themNguoiThue(NguoiThueModel nguoiThue);
   Future<void> updateNguoiThue(NguoiThueModel nguoiThue);
   Future<void> xoaNguoiThue(String nguoiThueId);
 }
@@ -26,8 +26,9 @@ class NguoiThueRemoteDataSourceImpl implements NguoiThueRemoteDataSource {
   }
 
   @override
-  Future<void> themNguoiThue(NguoiThueModel nguoiThue) {
-    return _firestore.collection('nguoi_thue').add(nguoiThue.toFirestore());
+  Future<String> themNguoiThue(NguoiThueModel nguoiThue) async {
+    final docRef = await _firestore.collection('nguoi_thue').add(nguoiThue.toFirestore());
+    return docRef.id;
   }
 
   @override

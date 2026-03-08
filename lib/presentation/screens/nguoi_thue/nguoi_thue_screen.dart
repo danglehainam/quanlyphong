@@ -91,7 +91,10 @@ class _NguoiThueCard extends StatelessWidget {
       confirmLabel: 'Xóa',
       confirmColor: AppColors.error,
       onConfirm: () {
-        context.read<NguoiThueBloc>().add(XoaNguoiThueRequested(item.id));
+        context.read<NguoiThueBloc>().add(XoaNguoiThueRequested(
+              item.id,
+              currentPhongId: item.phongId,
+            ));
       },
     );
   }

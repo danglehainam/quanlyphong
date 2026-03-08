@@ -106,7 +106,7 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
   }
 
   void _onTapChonPhong() async {
-    final result = await showModalBottomSheet<List<String>>(
+    final result = await showModalBottomSheet<List<RoomSelectionResult>>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -126,7 +126,7 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
 
     if (result != null) {
       setState(() {
-        _selectedPhongIds = result;
+        _selectedPhongIds = result.map((r) => r.id).toList();
       });
     }
   }

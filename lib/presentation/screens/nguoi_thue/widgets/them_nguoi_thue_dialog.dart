@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import '../../../../core/constants/app_colors.dart';
+import '../../../../core/di/dependency_Injection.dart';
 import '../../../../domain/entities/nguoi_thue_entity.dart';
+import '../../../bloc/ap_dung_bang_gia/ap_dung_bang_gia_bloc.dart';
+import '../../../bloc/ap_dung_bang_gia/ap_dung_bang_gia_event.dart';
 import '../../../bloc/nguoi_thue/nguoi_thue_bloc.dart';
 import '../../../bloc/nguoi_thue/nguoi_thue_event.dart';
 import '../../../bloc/nguoi_thue/nguoi_thue_state.dart';
 import '../../../widgets/app_text_field.dart';
 import '../../../widgets/app_dialog_actions.dart';
 import '../../../widgets/app_snackbar.dart';
+import '../../gia/widgets/chon_phong_selection_dialog.dart';
 
 class ThemNguoiThueDialog extends StatefulWidget {
   final String chuNhaId;
@@ -28,6 +34,9 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
   late TextEditingController _soDienThoaiController;
   late TextEditingController _cccdController;
   late TextEditingController _queQuanController;
+  DateTime? _birthday;
+  String? _selectedPhongId;
+  String? _selectedPhongName;
 
   bool get _isEditing => widget.initialNguoiThue != null;
 
@@ -38,6 +47,8 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
     _soDienThoaiController = TextEditingController(text: widget.initialNguoiThue?.soDienThoai ?? '');
     _cccdController = TextEditingController(text: widget.initialNguoiThue?.cccd ?? '');
     _queQuanController = TextEditingController(text: widget.initialNguoiThue?.queQuan ?? '');
+    _birthday = widget.initialNguoiThue?.ngaySinh;
+    _selectedPhongId = widget.initialNguoiThue?.phongId;
   }
 
   @override
@@ -61,14 +72,55 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
       chuNhaId: widget.chuNhaId,
       createdAt: widget.initialNguoiThue?.createdAt,
       anhCCCD: widget.initialNguoiThue?.anhCCCD ?? [],
-      ngaySinh: widget.initialNguoiThue?.ngaySinh,
+      ngaySinh: _birthday,
     );
 
     if (_isEditing) {
-      context.read<NguoiThueBloc>().add(UpdateNguoiThueRequested(nguoiThue));
+      context.read<NguoiThueBloc>().add(UpdateNguoiThueRequested(
+            nguoiThue,
+            newPhongId: _selectedPhongId,
+          ));
     } else {
-      context.read<NguoiThueBloc>().add(ThemNguoiThueRequested(nguoiThue));
+      context.read<NguoiThueBloc>().add(ThemNguoiThueRequested(
+            nguoiThue,
+            phongId: _selectedPhongId,
+          ));
     }
+  }
+
+  Future<void> _selectBirthday() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _birthday ?? DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() => _birthday = picked);
+    }
+  }
+
+  void _selectPhong() {
+    showModalBottomSheet<List<RoomSelectionResult>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => BlocProvider(
+        create: (context) => serviceLocator<ApDungBangGiaBloc>()..add(ApDungBangGiaStarted(widget.chuNhaId)),
+        child: ChonPhongSelectionDialog(
+          initialSelectedIds: _selectedPhongId != null ? [_selectedPhongId!] : [],
+          isSingleSelection: true,
+        ),
+      ),
+    ).then((selectedIds) {
+      if (selectedIds != null && selectedIds.isNotEmpty) {
+        setState(() {
+          final result = selectedIds.first;
+          _selectedPhongId = result.id;
+          _selectedPhongName = result.displayName;
+        });
+      }
+    });
   }
 
   @override
@@ -124,14 +176,40 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
                   isRequired: true,
                 ),
                 AppTextField(
+                  controller: TextEditingController(
+                    text: _birthday != null ? DateFormat('dd/MM/yyyy').format(_birthday!) : '',
+                  ),
+                  label: 'Ngày sinh (Tùy chọn)',
+                  hint: 'Chọn ngày sinh...',
+                  readOnly: true,
+                  onTap: _selectBirthday,
+                  suffixIcon: const Icon(Icons.calendar_today, size: 20, color: AppColors.primary),
+                  isRequired: false,
+                ),
+                AppTextField(
                   controller: _cccdController,
                   label: 'Số CCCD/CMND (Tùy chọn)',
                   hint: 'Nhập số CCCD...',
+                  isRequired: false,
                 ),
                 AppTextField(
                   controller: _queQuanController,
                   label: 'Quê quán (Tùy chọn)',
                   hint: 'Nhập quê quán...',
+                  isRequired: false,
+                ),
+                const SizedBox(height: 16),
+                // Chọn phòng
+                AppTextField(
+                  controller: TextEditingController(
+                    text: _selectedPhongName ?? '',
+                  ),
+                  label: 'Phòng thuê (Tùy chọn)',
+                  hint: 'Chọn phòng thuê...',
+                  readOnly: true,
+                  onTap: _selectPhong,
+                  suffixIcon: const Icon(Icons.meeting_room, size: 20, color: AppColors.primary),
+                  isRequired: false,
                 ),
                 const SizedBox(height: 32),
                 BlocBuilder<NguoiThueBloc, NguoiThueState>(

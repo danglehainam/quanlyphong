@@ -11,6 +11,8 @@ abstract class PhongRemoteDataSource {
   Future<void> deleteNhaTroWithPhong(String nhaTroId);
   Future<void> updateBangGiaChoPhongList(List<String> phongIds, String bangGiaId);
   Future<void> xoaBangGiaKhoiTatCaPhong(String bangGiaId, String chuNhaId);
+  Future<void> addKhachThueToPhong(String phongId, String nguoiThueId);
+  Future<void> removeKhachThueFromPhong(String phongId, String nguoiThueId);
 }
 
 class PhongRemoteDataSourceImpl implements PhongRemoteDataSource {
@@ -154,5 +156,31 @@ class PhongRemoteDataSourceImpl implements PhongRemoteDataSource {
     }
     
     await batch.commit();
+  }
+
+  @override
+  Future<void> addKhachThueToPhong(String phongId, String nguoiThueId) {
+    return _firestore.collection('phong').doc(phongId).update({
+      'khachThue': FieldValue.arrayUnion([nguoiThueId]),
+      'trangThai': 1, // Đã thuê
+    });
+  }
+
+  @override
+  Future<void> removeKhachThueFromPhong(String phongId, String nguoiThueId) async {
+    final docRef = _firestore.collection('phong').doc(phongId);
+    final doc = await docRef.get();
+    if (!doc.exists) return;
+
+    final currentKhach = List<String>.from(doc.data()?['khachThue'] ?? []);
+    currentKhach.remove(nguoiThueId);
+
+    // Update status to available (0) if no more renters
+    final status = currentKhach.isEmpty ? 0 : 1;
+
+    await docRef.update({
+      'khachThue': FieldValue.arrayRemove([nguoiThueId]),
+      'trangThai': status,
+    });
   }
 }

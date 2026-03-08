@@ -50,7 +50,10 @@ class NguoiThueBloc extends Bloc<NguoiThueEvent, NguoiThueState> {
       ThemNguoiThueRequested event, Emitter<NguoiThueState> emit) async {
     emit(NguoiThueActionLoading());
     try {
-      await _themNguoiThue(event.nguoiThue);
+      final nguoiThueToSave = event.nguoiThue.copyWith(
+        phongId: event.phongId,
+      );
+      await _themNguoiThue(nguoiThueToSave, phongId: event.phongId);
       emit(NguoiThueActionSuccess());
     } catch (e) {
       emit(NguoiThueActionFailure(e.toString()));
@@ -61,7 +64,14 @@ class NguoiThueBloc extends Bloc<NguoiThueEvent, NguoiThueState> {
       UpdateNguoiThueRequested event, Emitter<NguoiThueState> emit) async {
     emit(NguoiThueActionLoading());
     try {
-      await _updateNguoiThue(event.nguoiThue);
+      final nguoiThueToSave = event.nguoiThue.copyWith(
+        phongId: event.newPhongId,
+      );
+      await _updateNguoiThue(
+        nguoiThueToSave,
+        oldPhongId: event.nguoiThue.phongId,
+        newPhongId: event.newPhongId,
+      );
       emit(NguoiThueActionSuccess());
     } catch (e) {
       emit(NguoiThueActionFailure(e.toString()));
@@ -72,7 +82,7 @@ class NguoiThueBloc extends Bloc<NguoiThueEvent, NguoiThueState> {
       XoaNguoiThueRequested event, Emitter<NguoiThueState> emit) async {
     emit(NguoiThueActionLoading());
     try {
-      await _xoaNguoiThue(event.nguoiThueId);
+      await _xoaNguoiThue(event.nguoiThueId, currentPhongId: event.currentPhongId);
       emit(NguoiThueActionSuccess());
     } catch (e) {
       emit(NguoiThueActionFailure(e.toString()));

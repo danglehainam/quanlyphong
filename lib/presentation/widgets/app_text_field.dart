@@ -9,7 +9,10 @@ class AppTextField extends StatelessWidget {
   final bool isNumber;
   final bool isCurrency;
   final bool isRequired;
+  final bool readOnly;
   final int? maxLines;
+  final Widget? suffixIcon;
+  final VoidCallback? onTap;
 
   const AppTextField({
     super.key,
@@ -20,7 +23,10 @@ class AppTextField extends StatelessWidget {
     this.isNumber = false,
     this.isCurrency = false,
     this.isRequired = true,
+    this.readOnly = false,
     this.maxLines = 1,
+    this.suffixIcon,
+    this.onTap,
   });
 
   @override
@@ -30,6 +36,8 @@ class AppTextField extends StatelessWidget {
       child: TextFormField(
         controller: controller,
         enabled: !isLoading,
+        readOnly: readOnly,
+        onTap: onTap,
         maxLines: maxLines,
         keyboardType: isNumber || isCurrency ? TextInputType.number : TextInputType.text,
         inputFormatters: isCurrency ? [CurrencyInputFormatter()] : null,
@@ -40,6 +48,7 @@ class AppTextField extends StatelessWidget {
           alignLabelWithHint: maxLines != null && maxLines! > 1,
           isDense: true,
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          suffixIcon: suffixIcon,
         ),
         validator: (value) {
           if (isRequired && (value == null || value.trim().isEmpty)) {

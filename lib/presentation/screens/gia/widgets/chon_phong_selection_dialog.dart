@@ -5,12 +5,28 @@ import '../../../../domain/entities/phong_entity.dart';
 import '../../../bloc/ap_dung_bang_gia/ap_dung_bang_gia_bloc.dart';
 import '../../../bloc/ap_dung_bang_gia/ap_dung_bang_gia_state.dart';
 
+class RoomSelectionResult {
+  final String id;
+  final String tenPhong;
+  final String tenNhaTro;
+
+  RoomSelectionResult({
+    required this.id,
+    required this.tenPhong,
+    required this.tenNhaTro,
+  });
+
+  String get displayName => 'Phòng $tenPhong ($tenNhaTro)';
+}
+
 class ChonPhongSelectionDialog extends StatefulWidget {
   final List<String> initialSelectedIds;
+  final bool isSingleSelection;
 
   const ChonPhongSelectionDialog({
     super.key,
     this.initialSelectedIds = const [],
+    this.isSingleSelection = false,
   });
 
   @override
@@ -34,72 +50,87 @@ class _ChonPhongSelectionDialogState extends State<ChonPhongSelectionDialog> {
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Header
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Chọn phòng áp dụng',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-          ),
-          const Divider(),
-
-          // Danh sách phòng
-          Flexible(
-            child: BlocBuilder<ApDungBangGiaBloc, ApDungBangGiaState>(
-              builder: (context, state) {
-                if (state is ApDungBangGiaLoading) {
-                  return const Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-
-                if (state is ApDungBangGiaLoaded) {
-                  return _buildList(state);
-                }
-
-                return const SizedBox.shrink();
-              },
-            ),
-          ),
-
-          // Nút Xác nhận
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                onPressed: () {
-                  Navigator.pop(context, _selectedIds.toList());
-                },
-                child: Text(
-                  'Xác nhận (${_selectedIds.length} phòng)',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      child: BlocBuilder<ApDungBangGiaBloc, ApDungBangGiaState>(
+        builder: (context, state) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Chọn phòng áp dụng',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          ),
-        ],
+              const Divider(),
+
+              // Danh sách phòng
+              Flexible(
+                child: _buildBody(state),
+              ),
+
+              // Nút Xác nhận
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: state is ApDungBangGiaLoaded
+                        ? () {
+                            final results = _selectedIds.map((id) {
+                              final phong = state.phongList.firstWhere((p) => p.id == id);
+                              final nhaTro = state.nhaTroList.firstWhere((n) => n.id == phong.nhaTroId);
+                              return RoomSelectionResult(
+                                id: id,
+                                tenPhong: phong.tenPhong,
+                                tenNhaTro: nhaTro.tenNhaTro,
+                              );
+                            }).toList();
+                            Navigator.pop(context, results);
+                          }
+                        : null,
+                    child: Text(
+                      widget.isSingleSelection ? 'Xác nhận' : 'Xác nhận (${_selectedIds.length} phòng)',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
+  }
+
+  Widget _buildBody(ApDungBangGiaState state) {
+    if (state is ApDungBangGiaLoading) {
+      return const Padding(
+        padding: EdgeInsets.all(32),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (state is ApDungBangGiaLoaded) {
+      return _buildList(state);
+    }
+
+    return const SizedBox.shrink();
   }
 
   Widget _buildList(ApDungBangGiaLoaded state) {
@@ -139,10 +170,15 @@ class _ChonPhongSelectionDialogState extends State<ChonPhongSelectionDialog> {
                 activeColor: AppColors.primary,
                 onChanged: (bool? value) {
                   setState(() {
-                    if (value == true) {
-                      _selectedIds.add(phong.id);
+                    if (widget.isSingleSelection) {
+                      _selectedIds.clear();
+                      if (value == true) _selectedIds.add(phong.id);
                     } else {
-                      _selectedIds.remove(phong.id);
+                      if (value == true) {
+                        _selectedIds.add(phong.id);
+                      } else {
+                        _selectedIds.remove(phong.id);
+                      }
                     }
                   });
                 },

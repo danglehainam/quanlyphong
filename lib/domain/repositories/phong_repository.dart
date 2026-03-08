@@ -10,4 +10,6 @@ abstract class PhongRepository {
   Future<void> deleteNhaTroWithPhong(String nhaTroId);
   Future<void> updateBangGiaChoPhongList(List<String> phongIds, String bangGiaId);
   Future<void> xoaBangGiaKhoiTatCaPhong(String bangGiaId, String chuNhaId);
+  Future<void> addKhachThueToPhong(String phongId, String nguoiThueId);
+  Future<void> removeKhachThueFromPhong(String phongId, String nguoiThueId);
 }

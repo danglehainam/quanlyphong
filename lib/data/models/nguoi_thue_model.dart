@@ -11,6 +11,7 @@ class NguoiThueModel {
   final List<String> anhCCCD;
   final String chuNhaId;
   final DateTime? createdAt;
+  final String? phongId;
 
   const NguoiThueModel({
     required this.id,
@@ -22,6 +23,7 @@ class NguoiThueModel {
     this.anhCCCD = const [],
     required this.chuNhaId,
     this.createdAt,
+    this.phongId,
   });
 
   factory NguoiThueModel.fromFirestore(DocumentSnapshot doc) {
@@ -36,6 +38,7 @@ class NguoiThueModel {
       anhCCCD: List<String>.from(data['anhCCCD'] ?? []),
       chuNhaId: data['chuNhaId'] as String? ?? '',
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
+      phongId: data['phongId'] as String?,
     );
   }
 
@@ -50,6 +53,7 @@ class NguoiThueModel {
       anhCCCD: entity.anhCCCD,
       chuNhaId: entity.chuNhaId,
       createdAt: entity.createdAt,
+      phongId: entity.phongId,
     );
   }
 
@@ -63,6 +67,7 @@ class NguoiThueModel {
       'anhCCCD': anhCCCD,
       'chuNhaId': chuNhaId,
       'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : FieldValue.serverTimestamp(),
+      'phongId': phongId,
     };
   }
 
@@ -77,6 +82,7 @@ class NguoiThueModel {
       anhCCCD: anhCCCD,
       chuNhaId: chuNhaId,
       createdAt: createdAt,
+      phongId: phongId,
     );
   }
 }

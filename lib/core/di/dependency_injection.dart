@@ -80,9 +80,9 @@ Future<void> init() async {
         phongRepository: serviceLocator(),
       ));
   serviceLocator.registerLazySingleton(() => WatchNguoiThueListUseCase(serviceLocator()));
-  serviceLocator.registerLazySingleton(() => ThemNguoiThueUseCase(serviceLocator()));
-  serviceLocator.registerLazySingleton(() => UpdateNguoiThueUseCase(serviceLocator()));
-  serviceLocator.registerLazySingleton(() => XoaNguoiThueUseCase(serviceLocator()));
+  serviceLocator.registerLazySingleton(() => ThemNguoiThueUseCase(serviceLocator(), serviceLocator()));
+  serviceLocator.registerLazySingleton(() => UpdateNguoiThueUseCase(serviceLocator(), serviceLocator()));
+  serviceLocator.registerLazySingleton(() => XoaNguoiThueUseCase(serviceLocator(), serviceLocator()));
 
   // 3. Blocs
   serviceLocator.registerFactory(() => AuthBloc(

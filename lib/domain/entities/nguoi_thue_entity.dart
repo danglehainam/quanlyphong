@@ -10,6 +10,7 @@ class NguoiThueEntity extends Equatable {
   final List<String> anhCCCD;
   final String chuNhaId;
   final DateTime? createdAt;
+  final String? phongId;
 
   const NguoiThueEntity({
     required this.id,
@@ -21,6 +22,7 @@ class NguoiThueEntity extends Equatable {
     this.anhCCCD = const [],
     required this.chuNhaId,
     this.createdAt,
+    this.phongId,
   });
 
   @override
@@ -34,6 +36,7 @@ class NguoiThueEntity extends Equatable {
         anhCCCD,
         chuNhaId,
         createdAt,
+        phongId,
       ];
 
   NguoiThueEntity copyWith({
@@ -46,6 +49,7 @@ class NguoiThueEntity extends Equatable {
     List<String>? anhCCCD,
     String? chuNhaId,
     DateTime? createdAt,
+    String? phongId,
   }) {
     return NguoiThueEntity(
       id: id ?? this.id,
@@ -57,6 +61,7 @@ class NguoiThueEntity extends Equatable {
       anhCCCD: anhCCCD ?? this.anhCCCD,
       chuNhaId: chuNhaId ?? this.chuNhaId,
       createdAt: createdAt ?? this.createdAt,
+      phongId: phongId ?? this.phongId,
     );
   }
 }

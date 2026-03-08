@@ -19,27 +19,36 @@ class NguoiThueStarted extends NguoiThueEvent {
 
 class ThemNguoiThueRequested extends NguoiThueEvent {
   final NguoiThueEntity nguoiThue;
+  final String? phongId;
 
-  const ThemNguoiThueRequested(this.nguoiThue);
+  const ThemNguoiThueRequested(
+    this.nguoiThue, {
+    this.phongId,
+  });
 
   @override
-  List<Object?> get props => [nguoiThue];
+  List<Object?> get props => [nguoiThue, phongId];
 }
 
 class UpdateNguoiThueRequested extends NguoiThueEvent {
   final NguoiThueEntity nguoiThue;
+  final String? newPhongId;
 
-  const UpdateNguoiThueRequested(this.nguoiThue);
+  const UpdateNguoiThueRequested(
+    this.nguoiThue, {
+    this.newPhongId,
+  });
 
   @override
-  List<Object?> get props => [nguoiThue];
+  List<Object?> get props => [nguoiThue, newPhongId];
 }
 
 class XoaNguoiThueRequested extends NguoiThueEvent {
   final String nguoiThueId;
+  final String? currentPhongId;
 
-  const XoaNguoiThueRequested(this.nguoiThueId);
+  const XoaNguoiThueRequested(this.nguoiThueId, {this.currentPhongId});
 
   @override
-  List<Object?> get props => [nguoiThueId];
+  List<Object?> get props => [nguoiThueId, currentPhongId];
 }

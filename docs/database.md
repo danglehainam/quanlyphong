@@ -1,7 +1,7 @@
 # Thiết kế Database — Chủ Nhà App
 # Nền tảng: Firebase Firestore (NoSQL)
 # Mã hóa: UTF-8
-# Cập nhật lần cuối: 2026-03-06
+# Cập nhật lần cuối: 2026-03-08
 #
 # QUY ƯỚC:
 #   - Tất cả timestamp: Firestore Timestamp (UTC)
@@ -172,6 +172,7 @@ SCHEMA:
   anhCCCD       [CÓ_THỂ_NULL] string[]         — Danh sách URL ảnh CCCD (Firebase Storage)
   chuNhaId      [BẮT_BUỘC]    string [INDEXED] — ref → users/{chuNhaId}
   createdAt     [BẮT_BUỘC]    Timestamp
+  phongId       [CÓ_THỂ_NULL] string [INDEXED] — ref → phong/{phongId} (Phòng đang thuê hiện tại)
 
 VÍ DỤ DOCUMENT (nguoi_thue/nt_user001):
 ```json
@@ -186,7 +187,8 @@ VÍ DỤ DOCUMENT (nguoi_thue/nt_user001):
     "https://firebasestorage.googleapis.com/.../cccd_mat_sau.jpg"
   ],
   "chuNhaId": "abc123",
-  "createdAt": "2025-02-01T00:00:00Z"
+  "createdAt": "2025-02-01T00:00:00Z",
+  "phongId": "p101"
 }
 ```
 

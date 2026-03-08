@@ -52,4 +52,14 @@ class PhongRepositoryImpl implements PhongRepository {
   Future<void> deleteNhaTroWithPhong(String nhaTroId) {
     return remoteDataSource.deleteNhaTroWithPhong(nhaTroId);
   }
+
+  @override
+  Future<void> addKhachThueToPhong(String phongId, String nguoiThueId) {
+    return remoteDataSource.addKhachThueToPhong(phongId, nguoiThueId);
+  }
+
+  @override
+  Future<void> removeKhachThueFromPhong(String phongId, String nguoiThueId) {
+    return remoteDataSource.removeKhachThueFromPhong(phongId, nguoiThueId);
+  }
 }

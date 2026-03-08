@@ -16,7 +16,7 @@ class NguoiThueRepositoryImpl implements NguoiThueRepository {
   }
 
   @override
-  Future<void> themNguoiThue(NguoiThueEntity nguoiThue) {
+  Future<String> themNguoiThue(NguoiThueEntity nguoiThue) {
     return remoteDataSource.themNguoiThue(NguoiThueModel.fromEntity(nguoiThue));
   }
 

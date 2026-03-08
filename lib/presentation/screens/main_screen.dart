@@ -12,6 +12,8 @@ import 'nguoi_thue/nguoi_thue_screen.dart';
 import 'cai_dat/cai_dat_screen.dart'; // Added this import
 import '../widgets/app_bar_add_button.dart';
 import 'phong/widgets/them_nha_tro_dialog.dart';
+import 'nguoi_thue/widgets/them_nguoi_thue_dialog.dart';
+import '../bloc/nguoi_thue/nguoi_thue_bloc.dart';
 import '../../core/constants/app_colors.dart';
 
 class MainScreen extends StatefulWidget {
@@ -65,6 +67,26 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  void _showThemNguoiThueDialog(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (bottomSheetContext) => BlocProvider.value(
+        value: context.read<NguoiThueBloc>(),
+        child: DraggableScrollableSheet(
+          initialChildSize: 0.7,
+          maxChildSize: 0.9,
+          minChildSize: 0.5,
+          expand: false,
+          builder: (_, controller) => ThemNguoiThueDialog(
+            chuNhaId: widget.user.uid,
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,6 +98,11 @@ class _MainScreenState extends State<MainScreen> {
             AppBarAddButton(
               tooltip: 'Thêm nhà trọ',
               onPressed: () => _showThemNhaTroDialog(context),
+            ),
+          if (_currentIndex == 2)
+            AppBarAddButton(
+              tooltip: 'Thêm người thuê',
+              onPressed: () => _showThemNguoiThueDialog(context),
             ),
           BlocBuilder<AuthBloc, AuthState>(
             builder: (context, state) {

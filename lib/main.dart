@@ -10,6 +10,8 @@ import 'presentation/screens/login_screen.dart';
 import 'presentation/screens/main_screen.dart';
 import 'presentation/bloc/phong/phong_bloc.dart';
 import 'presentation/bloc/phong/phong_event.dart';
+import 'presentation/bloc/nguoi_thue/nguoi_thue_bloc.dart';
+import 'presentation/bloc/nguoi_thue/nguoi_thue_event.dart';
 
 import 'core/di/dependency_injection.dart' as dependency_injection;
 
@@ -42,10 +44,19 @@ class MyApp extends StatelessWidget {
         home: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             if (state is AuthAuthenticated) {
-              return BlocProvider(
-                create: (context) =>
-                    dependency_injection.serviceLocator<PhongBloc>()
-                      ..add(PhongStarted(state.user.uid)),
+              return MultiBlocProvider(
+                providers: [
+                  BlocProvider(
+                    create: (context) =>
+                        dependency_injection.serviceLocator<PhongBloc>()
+                          ..add(PhongStarted(state.user.uid)),
+                  ),
+                  BlocProvider(
+                    create: (context) =>
+                        dependency_injection.serviceLocator<NguoiThueBloc>()
+                          ..add(NguoiThueStarted(state.user.uid)),
+                  ),
+                ],
                 child: MainScreen(user: state.user),
               );
             }

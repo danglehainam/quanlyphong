@@ -281,3 +281,4 @@ service cloud.firestore {
 | `hoa_don` | `chuNhaId` ASC, `tenHoaDon` ASC | Danh sách hóa đơn theo chủ nhà + tên |
 | `hoa_don` | `phongId` ASC, `tenHoaDon` ASC | Danh sách hóa đơn của một phòng |
 | `hoa_don` | `chuNhaId` ASC, `daThanhToan` ASC | Tìm hóa đơn chưa thanh toán/đã thanh toán |
+| `nguoi_thue` | `chuNhaId` ASC, `createdAt` DESC | Danh sách người thuê theo chủ nhà + mới nhất |

@@ -3,16 +3,19 @@ import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../../domain/repositories/phong_repository.dart';
 import '../../domain/repositories/bang_gia_repository.dart';
+import '../../domain/repositories/nguoi_thue_repository.dart';
 
 import '../../data/datasources/remote/auth_remote_data_source.dart';
 import '../../data/datasources/remote/user_remote_data_source.dart';
 import '../../data/datasources/remote/phong_remote_data_source.dart';
 import '../../data/datasources/remote/bang_gia_remote_data_source.dart';
+import '../../data/datasources/remote/nguoi_thue_remote_data_source.dart';
 
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/user_repository_impl.dart';
 import '../../data/repositories/phong_repository_impl.dart';
 import '../../data/repositories/bang_gia_repository_impl.dart';
+import '../../data/repositories/nguoi_thue_repository_impl.dart';
 
 import '../../domain/usecases/get_auth_status.dart';
 import '../../domain/usecases/log_out.dart';
@@ -29,9 +32,14 @@ import '../../domain/usecases/watch_tat_ca_phong.dart';
 import '../../domain/usecases/update_bang_gia_cho_phong_list.dart';
 import '../../domain/usecases/xoa_bang_gia.dart';
 import '../../domain/usecases/update_bang_gia.dart';
+import '../../domain/usecases/watch_nguoi_thue_list.dart';
+import '../../domain/usecases/them_nguoi_thue.dart';
+import '../../domain/usecases/update_nguoi_thue.dart';
+import '../../domain/usecases/xoa_nguoi_thue.dart';
 import '../../presentation/bloc/auth/auth_bloc.dart';
 import '../../presentation/bloc/phong/phong_bloc.dart';
 import '../../presentation/bloc/bang_gia/bang_gia_bloc.dart';
+import '../../presentation/bloc/nguoi_thue/nguoi_thue_bloc.dart';
 import '../../presentation/bloc/ap_dung_bang_gia/ap_dung_bang_gia_bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -43,12 +51,14 @@ Future<void> init() async {
   serviceLocator.registerLazySingleton<UserRemoteDataSource>(() => UserRemoteDataSourceImpl());
   serviceLocator.registerLazySingleton<PhongRemoteDataSource>(() => PhongRemoteDataSourceImpl());
   serviceLocator.registerLazySingleton<BangGiaRemoteDataSource>(() => BangGiaRemoteDataSourceImpl(FirebaseFirestore.instance));
+  serviceLocator.registerLazySingleton<NguoiThueRemoteDataSource>(() => NguoiThueRemoteDataSourceImpl(FirebaseFirestore.instance));
 
   // 2. Repositories
   serviceLocator.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl(remoteDataSource: serviceLocator()));
   serviceLocator.registerLazySingleton<UserRepository>(() => UserRepositoryImpl(remoteDataSource: serviceLocator()));
   serviceLocator.registerLazySingleton<PhongRepository>(() => PhongRepositoryImpl(remoteDataSource: serviceLocator()));
   serviceLocator.registerLazySingleton<BangGiaRepository>(() => BangGiaRepositoryImpl(serviceLocator()));
+  serviceLocator.registerLazySingleton<NguoiThueRepository>(() => NguoiThueRepositoryImpl(serviceLocator()));
 
   // 2. Use Cases
   serviceLocator.registerLazySingleton(() => GetAuthStatusUseCase(serviceLocator()));
@@ -69,6 +79,10 @@ Future<void> init() async {
         bangGiaRepository: serviceLocator(),
         phongRepository: serviceLocator(),
       ));
+  serviceLocator.registerLazySingleton(() => WatchNguoiThueListUseCase(serviceLocator()));
+  serviceLocator.registerLazySingleton(() => ThemNguoiThueUseCase(serviceLocator()));
+  serviceLocator.registerLazySingleton(() => UpdateNguoiThueUseCase(serviceLocator()));
+  serviceLocator.registerLazySingleton(() => XoaNguoiThueUseCase(serviceLocator()));
 
   // 3. Blocs
   serviceLocator.registerFactory(() => AuthBloc(
@@ -98,5 +112,12 @@ Future<void> init() async {
         watchNhaTroList: serviceLocator(),
         watchTatCaPhong: serviceLocator(),
         updateBangGiaChoPhongList: serviceLocator(),
+      ));
+
+  serviceLocator.registerFactory(() => NguoiThueBloc(
+        watchNguoiThueList: serviceLocator(),
+        themNguoiThue: serviceLocator(),
+        updateNguoiThue: serviceLocator(),
+        xoaNguoiThue: serviceLocator(),
       ));
 }

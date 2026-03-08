@@ -52,3 +52,13 @@ class XoaNguoiThueRequested extends NguoiThueEvent {
   @override
   List<Object?> get props => [nguoiThueId, currentPhongId];
 }
+
+class XoaKhachThuKhoiPhongRequested extends NguoiThueEvent {
+  final NguoiThueEntity nguoiThue;
+  final String phongId;
+
+  const XoaKhachThuKhoiPhongRequested(this.nguoiThue, this.phongId);
+
+  @override
+  List<Object?> get props => [nguoiThue, phongId];
+}

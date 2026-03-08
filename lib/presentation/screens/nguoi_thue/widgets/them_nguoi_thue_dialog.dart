@@ -19,12 +19,16 @@ class ThemNguoiThueDialog extends StatefulWidget {
   final String chuNhaId;
   final NguoiThueEntity? initialNguoiThue;
   final ScrollController? scrollController;
+  final String? preselectedPhongId;
+  final bool isRoomFixed;
 
   const ThemNguoiThueDialog({
     super.key,
     required this.chuNhaId,
     this.initialNguoiThue,
     this.scrollController,
+    this.preselectedPhongId,
+    this.isRoomFixed = false,
   });
 
   @override
@@ -52,7 +56,7 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
     _queQuanController = TextEditingController(text: widget.initialNguoiThue?.queQuan ?? '');
     _phongNameController = TextEditingController();
     _birthday = widget.initialNguoiThue?.ngaySinh;
-    _selectedPhongId = widget.initialNguoiThue?.phongId;
+    _selectedPhongId = widget.preselectedPhongId ?? widget.initialNguoiThue?.phongId;
 
     if (_selectedPhongId != null) {
       _loadRoomDetail();
@@ -120,6 +124,11 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
   }
 
   void _selectPhong() {
+    if (widget.isRoomFixed) {
+      AppSnackBar.showError(context, 'Không thể đổi phòng khi thêm trực tiếp từ chi tiết phòng.');
+      return;
+    }
+
     showModalBottomSheet<List<RoomSelectionResult>>(
       context: context,
       isScrollControlled: true,
@@ -229,8 +238,12 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
                   label: 'Phòng thuê (Tùy chọn)',
                   hint: 'Chọn phòng thuê...',
                   readOnly: true,
-                  onTap: _selectPhong,
-                  suffixIcon: const Icon(Icons.meeting_room, size: 20, color: AppColors.primary),
+                  onTap: widget.isRoomFixed ? null : _selectPhong,
+                  suffixIcon: Icon(
+                    widget.isRoomFixed ? Icons.lock_outline : Icons.meeting_room,
+                    size: 20, 
+                    color: widget.isRoomFixed ? AppColors.textSecondary : AppColors.primary,
+                  ),
                   isRequired: false,
                 ),
                 const SizedBox(height: 32),

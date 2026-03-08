@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/di/dependency_Injection.dart';
+import '../../../../core/di/dependency_injection.dart';
 import '../../../../core/utils/currency_format.dart';
 import '../../../../domain/entities/phong_entity.dart';
 import '../../../../domain/entities/bang_gia_entity.dart';
 import '../../../../domain/entities/nguoi_thue_entity.dart';
 import '../../../../domain/usecases/get_bang_gia_by_id.dart';
 import '../../../../domain/usecases/get_nguoi_thue_by_id.dart';
+import '../../../bloc/nguoi_thue/nguoi_thue_bloc.dart';
+import '../../../bloc/nguoi_thue/nguoi_thue_event.dart';
+import '../../../bloc/nguoi_thue/nguoi_thue_state.dart';
+import '../../../widgets/app_snackbar.dart';
+import '../../../widgets/app_confirm_dialog.dart';
+import '../../nguoi_thue/widgets/them_nguoi_thue_dialog.dart';
 
 class PhongDetailDialog extends StatefulWidget {
   final PhongEntity phong;
@@ -27,11 +34,19 @@ class _PhongDetailDialogState extends State<PhongDetailDialog> {
   BangGiaEntity? _bangGia;
   List<NguoiThueEntity> _khachThue = [];
   bool _isLoading = true;
+  late NguoiThueBloc _nguoiThueBloc;
 
   @override
   void initState() {
     super.initState();
+    _nguoiThueBloc = serviceLocator<NguoiThueBloc>();
     _loadDetails();
+  }
+
+  @override
+  void dispose() {
+    _nguoiThueBloc.close();
+    super.dispose();
   }
 
   Future<void> _loadDetails() async {
@@ -67,15 +82,78 @@ class _PhongDetailDialogState extends State<PhongDetailDialog> {
     });
   }
 
+  void _showThemNguoiThue() async {
+    // 1. Lưu lại các biến cần thiết trước khi pop (vì context cũ sẽ bị unmount)
+    final rootContext = Navigator.of(context).context;
+    final chuNhaId = widget.phong.chuNhaId;
+    final phongId = widget.phong.id;
+
+    // 2. Đóng dialog hiện tại
+    Navigator.of(context).pop();
+
+    // 3. Đợi một event loop cho an toàn (tránh conflic root navigator)
+    await Future.delayed(const Duration(milliseconds: 50));
+
+    // 4. Mở dialog mới từ rootContext, cung cấp Bloc riêng
+    if (!rootContext.mounted) return;
+    showModalBottomSheet(
+      context: rootContext,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.9,
+        maxChildSize: 0.9,
+        minChildSize: 0.5,
+        expand: false,
+        builder: (bottomSheetContext, controller) => BlocProvider<NguoiThueBloc>(
+          create: (ctx) => serviceLocator<NguoiThueBloc>(),
+          child: ThemNguoiThueDialog(
+            chuNhaId: chuNhaId,
+            scrollController: controller,
+            preselectedPhongId: phongId,
+            isRoomFixed: true,
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _confirmRemoveRenter(NguoiThueEntity nguoiThue) {
+    showDialog(
+      context: context,
+      builder: (context) => AppConfirmDialog(
+        title: 'Xóa khỏi phòng',
+        content: 'Bạn có chắc chắn muốn xóa khách thuê "${nguoiThue.hoTen}" khỏi phòng này không?\n\nNgười này vẫn sẽ được lưu trong danh sách Người thuê chung.',
+        confirmLabel: 'Xóa',
+        confirmColor: AppColors.error,
+        onConfirm: () {
+          _nguoiThueBloc.add(XoaKhachThuKhoiPhongRequested(nguoiThue, widget.phong.id));
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(top: 8),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      child: Column(
+    return BlocProvider.value(
+      value: _nguoiThueBloc,
+      child: BlocListener<NguoiThueBloc, NguoiThueState>(
+        listener: (context, state) {
+          if (state is NguoiThueActionSuccess) {
+            AppSnackBar.showSuccess(context, 'Đã xóa khách thuê khỏi phòng!');
+            setState(() => _isLoading = true);
+            _loadDetails();
+          } else if (state is NguoiThueActionFailure) {
+            AppSnackBar.showError(context, 'Lỗi: ${state.message}');
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.only(top: 8),
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -146,16 +224,35 @@ class _PhongDetailDialogState extends State<PhongDetailDialog> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Tenants section
-                        _SectionTitle(
-                          icon: Icons.people_outlined,
-                          title: 'Khách thuê',
-                          count: _khachThue.length,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _SectionTitle(
+                              icon: Icons.people_outlined,
+                              title: 'Khách thuê',
+                              count: _khachThue.length,
+                            ),
+                            TextButton.icon(
+                              onPressed: _showThemNguoiThue,
+                              icon: const Icon(Icons.person_add_alt_1, size: 16),
+                              label: const Text('Thêm khách', style: TextStyle(fontWeight: FontWeight.bold)),
+                              style: TextButton.styleFrom(
+                                foregroundColor: AppColors.primary,
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 8),
                         if (_khachThue.isEmpty)
                           _EmptyRow(label: 'Chưa có khách thuê')
                         else
-                          ..._khachThue.map((nt) => _KhachThueRow(nguoiThue: nt)),
+                          ..._khachThue.map((nt) => _KhachThueRow(
+                                nguoiThue: nt,
+                                onRemove: () => _confirmRemoveRenter(nt),
+                              )),
 
                         const SizedBox(height: 20),
 
@@ -222,7 +319,7 @@ class _PhongDetailDialogState extends State<PhongDetailDialog> {
           ),
         ],
       ),
-    );
+    )));
   }
 
   Color get _statusColor => switch (widget.phong.trangThai) {
@@ -325,7 +422,8 @@ class _EmptyRow extends StatelessWidget {
 
 class _KhachThueRow extends StatelessWidget {
   final NguoiThueEntity nguoiThue;
-  const _KhachThueRow({required this.nguoiThue});
+  final VoidCallback onRemove;
+  const _KhachThueRow({required this.nguoiThue, required this.onRemove});
 
   @override
   Widget build(BuildContext context) {
@@ -355,6 +453,11 @@ class _KhachThueRow extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.person_remove_outlined, color: AppColors.error),
+              tooltip: 'Xóa khỏi phòng',
+              onPressed: onRemove,
             ),
           ],
         ),

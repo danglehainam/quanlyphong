@@ -31,6 +31,7 @@ class NguoiThueBloc extends Bloc<NguoiThueEvent, NguoiThueState> {
     on<ThemNguoiThueRequested>(_onThemNguoiThueRequested);
     on<UpdateNguoiThueRequested>(_onUpdateNguoiThueRequested);
     on<XoaNguoiThueRequested>(_onXoaNguoiThueRequested);
+    on<XoaKhachThuKhoiPhongRequested>(_onXoaKhachThuKhoiPhongRequested);
     on<_NguoiThueDataUpdated>((event, emit) {
       _items = event.items;
       emit(NguoiThueLoaded(_items));
@@ -89,6 +90,35 @@ class NguoiThueBloc extends Bloc<NguoiThueEvent, NguoiThueState> {
     emit(NguoiThueActionLoading());
     try {
       await _xoaNguoiThue(event.nguoiThueId, currentPhongId: event.currentPhongId);
+      emit(NguoiThueActionSuccess());
+      if (_items.isNotEmpty) emit(NguoiThueLoaded(_items));
+    } catch (e) {
+      emit(NguoiThueActionFailure(e.toString()));
+      if (_items.isNotEmpty) emit(NguoiThueLoaded(_items));
+    }
+  }
+
+  Future<void> _onXoaKhachThuKhoiPhongRequested(
+      XoaKhachThuKhoiPhongRequested event, Emitter<NguoiThueState> emit) async {
+    emit(NguoiThueActionLoading());
+    try {
+      final nguoiThueToSave = NguoiThueEntity(
+        id: event.nguoiThue.id,
+        hoTen: event.nguoiThue.hoTen,
+        soDienThoai: event.nguoiThue.soDienThoai,
+        cccd: event.nguoiThue.cccd,
+        ngaySinh: event.nguoiThue.ngaySinh,
+        queQuan: event.nguoiThue.queQuan,
+        anhCCCD: event.nguoiThue.anhCCCD,
+        chuNhaId: event.nguoiThue.chuNhaId,
+        createdAt: event.nguoiThue.createdAt,
+        phongId: null, // Gỡ bỏ phòng
+      );
+      await _updateNguoiThue(
+        nguoiThueToSave,
+        oldPhongId: event.phongId,
+        newPhongId: null,
+      );
       emit(NguoiThueActionSuccess());
       if (_items.isNotEmpty) emit(NguoiThueLoaded(_items));
     } catch (e) {

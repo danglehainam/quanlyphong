@@ -81,6 +81,7 @@ class _MainScreenState extends State<MainScreen> {
           expand: false,
           builder: (_, controller) => ThemNguoiThueDialog(
             chuNhaId: widget.user.uid,
+            scrollController: controller,
           ),
         ),
       ),

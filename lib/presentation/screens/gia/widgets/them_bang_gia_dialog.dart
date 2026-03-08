@@ -18,11 +18,13 @@ import 'chon_phong_selection_dialog.dart';
 class ThemBangGiaDialog extends StatefulWidget {
   final String chuNhaId;
   final BangGiaEntity? initialBangGia;
+  final ScrollController? scrollController;
 
   const ThemBangGiaDialog({
     super.key,
     required this.chuNhaId,
     this.initialBangGia,
+    this.scrollController,
   });
 
   @override
@@ -147,6 +149,7 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
           final isLoading = state is ThemBangGiaLoading;
 
           return Container(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -184,6 +187,7 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
                 const Divider(),
                 Flexible(
                   child: SingleChildScrollView(
+                    controller: widget.scrollController,
                     padding: const EdgeInsets.all(16),
                     child: Form(
                       key: _formKey,

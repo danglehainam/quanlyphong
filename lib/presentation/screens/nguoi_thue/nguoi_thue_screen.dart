@@ -95,6 +95,7 @@ class _NguoiThueCardState extends State<_NguoiThueCard> {
           builder: (_, controller) => ThemNguoiThueDialog(
             chuNhaId: widget.item.chuNhaId,
             initialNguoiThue: widget.item,
+            scrollController: controller,
           ),
         ),
       ),

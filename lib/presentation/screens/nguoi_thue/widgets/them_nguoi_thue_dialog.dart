@@ -18,11 +18,13 @@ import '../../gia/widgets/chon_phong_selection_dialog.dart';
 class ThemNguoiThueDialog extends StatefulWidget {
   final String chuNhaId;
   final NguoiThueEntity? initialNguoiThue;
+  final ScrollController? scrollController;
 
   const ThemNguoiThueDialog({
     super.key,
     required this.chuNhaId,
     this.initialNguoiThue,
+    this.scrollController,
   });
 
   @override
@@ -153,7 +155,12 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
         }
       },
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.fromLTRB(
+          24,
+          24,
+          24,
+          MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
@@ -161,6 +168,7 @@ class _ThemNguoiThueDialogState extends State<ThemNguoiThueDialog> {
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
+            controller: widget.scrollController,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,

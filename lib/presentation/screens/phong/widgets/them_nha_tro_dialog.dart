@@ -12,11 +12,13 @@ import '../../../../domain/entities/nha_tro_entity.dart';
 class ThemNhaTroDialog extends StatefulWidget {
   final String chuNhaId;
   final NhaTroEntity? initialNhaTro;
+  final ScrollController? scrollController;
 
   const ThemNhaTroDialog({
     super.key,
     required this.chuNhaId,
     this.initialNhaTro,
+    this.scrollController,
   });
 
   @override
@@ -83,6 +85,7 @@ class _ThemNhaTroDialogState extends State<ThemNhaTroDialog> {
           final isBlocLoading = state is ThemNhaTroLoading;
           
           return Container(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -120,6 +123,7 @@ class _ThemNhaTroDialogState extends State<ThemNhaTroDialog> {
                 const Divider(),
                 Flexible(
                   child: SingleChildScrollView(
+                    controller: widget.scrollController,
                     padding: const EdgeInsets.all(16),
                     child: Form(
                       key: _formKey,

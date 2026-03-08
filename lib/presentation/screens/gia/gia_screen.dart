@@ -39,6 +39,7 @@ class GiaScreen extends StatelessWidget {
           builder: (_, controller) => ThemBangGiaDialog(
             chuNhaId: chuNhaId,
             initialBangGia: bangGia,
+            scrollController: controller,
           ),
         ),
       ),

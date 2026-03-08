@@ -196,8 +196,9 @@ class _NhaTroSection extends StatelessWidget {
           minChildSize: 0.5,
           expand: false,
           builder: (_, controller) => ThemNhaTroDialog(
-            chuNhaId: nhaTro?.chuNhaId ?? '', // chuNhaId is effectively not needed if editing entity
+            chuNhaId: nhaTro?.chuNhaId ?? '',
             initialNhaTro: nhaTro,
+            scrollController: controller,
           ),
         ),
       ),

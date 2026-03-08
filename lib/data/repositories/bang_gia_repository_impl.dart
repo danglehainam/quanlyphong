@@ -16,7 +16,7 @@ class BangGiaRepositoryImpl implements BangGiaRepository {
   }
 
   @override
-  Future<void> themBangGia(BangGiaEntity bangGia) {
+  Future<String> themBangGia(BangGiaEntity bangGia) {
     final model = BangGiaModel.fromEntity(bangGia);
     return remoteDataSource.themBangGia(model);
   }

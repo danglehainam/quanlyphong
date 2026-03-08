@@ -6,7 +6,7 @@ class ThemBangGiaUseCase {
 
   ThemBangGiaUseCase(this.repository);
 
-  Future<void> call(BangGiaEntity bangGia) {
+  Future<String> call(BangGiaEntity bangGia) {
     return repository.themBangGia(bangGia);
   }
 }

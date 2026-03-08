@@ -20,6 +20,11 @@ class _PhongView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PhongBloc, PhongState>(
+      buildWhen: (previous, current) =>
+          current is PhongLoading ||
+          current is PhongLoaded ||
+          current is PhongError ||
+          current is PhongInitial,
       builder: (context, state) {
         if (state is PhongLoading || state is PhongInitial) {
           return const Center(child: CircularProgressIndicator());

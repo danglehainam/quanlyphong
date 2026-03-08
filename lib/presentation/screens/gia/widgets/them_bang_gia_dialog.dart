@@ -10,6 +10,10 @@ import '../../../widgets/app_dialog_actions.dart';
 import '../../../widgets/app_section_header.dart';
 import '../../../widgets/app_snackbar.dart';
 import '../../../../core/utils/currency_format.dart';
+import '../../../../core/di/dependency_Injection.dart';
+import '../../../bloc/ap_dung_bang_gia/ap_dung_bang_gia_bloc.dart';
+import '../../../bloc/ap_dung_bang_gia/ap_dung_bang_gia_event.dart';
+import 'chon_phong_selection_dialog.dart';
 
 class ThemBangGiaDialog extends StatefulWidget {
   final String chuNhaId;
@@ -37,6 +41,8 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
   int _cachTinhDien = 0;
   int _cachTinhNuoc = 0;
   int _cachTinhInternet = 0;
+  
+  List<String> _selectedPhongIds = [];
 
   @override
   void dispose() {
@@ -68,7 +74,36 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
       ghiChu: _ghiChuController.text.trim().isEmpty ? null : _ghiChuController.text.trim(),
     );
 
-    context.read<BangGiaBloc>().add(ThemBangGiaRequested(entity));
+    context.read<BangGiaBloc>().add(ThemBangGiaRequested(
+          entity,
+          selectedPhongIds: _selectedPhongIds,
+        ));
+  }
+
+  void _onTapChonPhong() async {
+    final result = await showModalBottomSheet<List<String>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (bottomSheetContext) => BlocProvider(
+        create: (context) => serviceLocator<ApDungBangGiaBloc>()..add(ApDungBangGiaStarted(widget.chuNhaId)),
+        child: DraggableScrollableSheet(
+          initialChildSize: 0.8,
+          maxChildSize: 0.9,
+          minChildSize: 0.5,
+          expand: false,
+          builder: (_, controller) => ChonPhongSelectionDialog(
+            initialSelectedIds: _selectedPhongIds,
+          ),
+        ),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedPhongIds = result;
+      });
+    }
   }
 
   @override
@@ -174,6 +209,28 @@ class _ThemBangGiaDialogState extends State<ThemBangGiaDialog> {
                           const AppSectionHeader(title: 'Chi phí khác'),
                           AppTextField(controller: _chiPhiKhacController, label: 'Số tiền (không bắt buộc)', hint: 'VND...', isLoading: isLoading, isCurrency: true, isRequired: false),
                           AppTextField(controller: _ghiChuController, label: 'Ghi chú chi phí', hint: 'VD: Rác, vệ sinh...', isLoading: isLoading, isRequired: false),
+                          const Divider(height: 32),
+                          
+                          // Chọn phòng
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: const Text('Áp dụng cho phòng', style: TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Text(_selectedPhongIds.isEmpty ? 'Chưa chọn phòng nào' : 'Đã chọn ${_selectedPhongIds.length} phòng'),
+                            trailing: TextButton.icon(
+                              onPressed: isLoading ? null : _onTapChonPhong,
+                              icon: const Icon(Icons.add_circle_outline, size: 20),
+                              label: Text(_selectedPhongIds.isEmpty ? 'Chọn phòng' : 'Thay đổi'),
+                            ),
+                          ),
+                          if (_selectedPhongIds.isNotEmpty)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 8),
+                              child: Text(
+                                'Bảng giá này sẽ được áp dụng ngay cho các phòng đã chọn sau khi lưu.',
+                                style: TextStyle(fontSize: 12, color: Colors.grey, fontStyle: FontStyle.italic),
+                              ),
+                            ),
+                          const SizedBox(height: 16),
                         ],
                       ),
                     ),

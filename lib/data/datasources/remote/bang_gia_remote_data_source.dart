@@ -3,7 +3,7 @@ import '../../models/bang_gia_model.dart';
 
 abstract class BangGiaRemoteDataSource {
   Stream<List<BangGiaModel>> watchBangGiaList(String chuNhaId);
-  Future<void> themBangGia(BangGiaModel bangGia);
+  Future<String> themBangGia(BangGiaModel bangGia);
 }
 
 class BangGiaRemoteDataSourceImpl implements BangGiaRemoteDataSource {
@@ -23,7 +23,8 @@ class BangGiaRemoteDataSourceImpl implements BangGiaRemoteDataSource {
   }
 
   @override
-  Future<void> themBangGia(BangGiaModel bangGia) {
-    return _firestore.collection('bang_gia').add(bangGia.toFirestore());
+  Future<String> themBangGia(BangGiaModel bangGia) async {
+    final docRef = await _firestore.collection('bang_gia').add(bangGia.toFirestore());
+    return docRef.id;
   }
 }

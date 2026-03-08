@@ -62,6 +62,10 @@ class GiaScreen extends StatelessWidget {
     return BlocProvider(
       create: (context) => serviceLocator<BangGiaBloc>()..add(BangGiaStarted(chuNhaId)),
       child: BlocBuilder<BangGiaBloc, BangGiaState>(
+        buildWhen: (previous, current) =>
+            current is BangGiaLoading ||
+            current is BangGiaLoaded ||
+            current is BangGiaError,
         builder: (context, state) {
           return Scaffold(
             appBar: AppBar(

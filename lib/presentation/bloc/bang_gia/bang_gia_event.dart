@@ -19,9 +19,10 @@ class BangGiaStarted extends BangGiaEvent {
 
 class ThemBangGiaRequested extends BangGiaEvent {
   final BangGiaEntity bangGia;
+  final List<String> selectedPhongIds;
 
-  const ThemBangGiaRequested(this.bangGia);
+  const ThemBangGiaRequested(this.bangGia, {this.selectedPhongIds = const []});
 
   @override
-  List<Object?> get props => [bangGia];
+  List<Object?> get props => [bangGia, selectedPhongIds];
 }

@@ -76,6 +76,7 @@ Future<void> init() async {
   serviceLocator.registerFactory(() => BangGiaBloc(
         watchBangGiaListUseCase: serviceLocator(),
         themBangGiaUseCase: serviceLocator(),
+        updateBangGiaChoPhongListUseCase: serviceLocator(),
       ));
 
   serviceLocator.registerFactory(() => ApDungBangGiaBloc(

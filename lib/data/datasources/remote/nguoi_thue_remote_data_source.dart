@@ -6,6 +6,7 @@ abstract class NguoiThueRemoteDataSource {
   Future<String> themNguoiThue(NguoiThueModel nguoiThue);
   Future<void> updateNguoiThue(NguoiThueModel nguoiThue);
   Future<void> xoaNguoiThue(String nguoiThueId);
+  Future<NguoiThueModel?> getNguoiThueById(String nguoiThueId);
 }
 
 class NguoiThueRemoteDataSourceImpl implements NguoiThueRemoteDataSource {
@@ -42,5 +43,12 @@ class NguoiThueRemoteDataSourceImpl implements NguoiThueRemoteDataSource {
   @override
   Future<void> xoaNguoiThue(String nguoiThueId) {
     return _firestore.collection('nguoi_thue').doc(nguoiThueId).delete();
+  }
+
+  @override
+  Future<NguoiThueModel?> getNguoiThueById(String nguoiThueId) async {
+    final doc = await _firestore.collection('nguoi_thue').doc(nguoiThueId).get();
+    if (!doc.exists) return null;
+    return NguoiThueModel.fromFirestore(doc);
   }
 }

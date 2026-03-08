@@ -5,4 +5,5 @@ abstract class BangGiaRepository {
   Future<String> themBangGia(BangGiaEntity bangGia);
   Future<void> xoaBangGia(String id);
   Future<void> updateBangGia(BangGiaEntity bangGia);
+  Future<BangGiaEntity?> getBangGiaById(String id);
 }

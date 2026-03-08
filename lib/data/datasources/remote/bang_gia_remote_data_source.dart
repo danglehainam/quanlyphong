@@ -6,6 +6,7 @@ abstract class BangGiaRemoteDataSource {
   Future<String> themBangGia(BangGiaModel bangGia);
   Future<void> xoaBangGia(String id);
   Future<void> updateBangGia(BangGiaModel bangGia);
+  Future<BangGiaModel?> getBangGiaById(String id);
 }
 
 class BangGiaRemoteDataSourceImpl implements BangGiaRemoteDataSource {
@@ -38,5 +39,12 @@ class BangGiaRemoteDataSourceImpl implements BangGiaRemoteDataSource {
   @override
   Future<void> updateBangGia(BangGiaModel bangGia) {
     return _firestore.collection('bang_gia').doc(bangGia.id).update(bangGia.toFirestore());
+  }
+
+  @override
+  Future<BangGiaModel?> getBangGiaById(String id) async {
+    final doc = await _firestore.collection('bang_gia').doc(id).get();
+    if (!doc.exists) return null;
+    return BangGiaModel.fromFirestore(doc);
   }
 }

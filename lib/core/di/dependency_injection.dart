@@ -37,6 +37,8 @@ import '../../domain/usecases/them_nguoi_thue.dart';
 import '../../domain/usecases/update_nguoi_thue.dart';
 import '../../domain/usecases/xoa_nguoi_thue.dart';
 import '../../domain/usecases/get_phong.dart';
+import '../../domain/usecases/get_bang_gia_by_id.dart';
+import '../../domain/usecases/get_nguoi_thue_by_id.dart';
 import '../../presentation/bloc/auth/auth_bloc.dart';
 import '../../presentation/bloc/phong/phong_bloc.dart';
 import '../../presentation/bloc/bang_gia/bang_gia_bloc.dart';
@@ -85,6 +87,8 @@ Future<void> init() async {
   serviceLocator.registerLazySingleton(() => UpdateNguoiThueUseCase(serviceLocator(), serviceLocator()));
   serviceLocator.registerLazySingleton(() => XoaNguoiThueUseCase(serviceLocator(), serviceLocator()));
   serviceLocator.registerLazySingleton(() => GetPhongUseCase(serviceLocator()));
+  serviceLocator.registerLazySingleton(() => GetBangGiaByIdUseCase(serviceLocator()));
+  serviceLocator.registerLazySingleton(() => GetNguoiThueByIdUseCase(serviceLocator()));
 
   // 3. Blocs
   serviceLocator.registerFactory(() => AuthBloc(

@@ -29,4 +29,10 @@ class BangGiaRepositoryImpl implements BangGiaRepository {
   Future<void> updateBangGia(BangGiaEntity bangGia) {
     return remoteDataSource.updateBangGia(BangGiaModel.fromEntity(bangGia));
   }
+
+  @override
+  Future<BangGiaEntity?> getBangGiaById(String id) async {
+    final model = await remoteDataSource.getBangGiaById(id);
+    return model?.toEntity();
+  }
 }

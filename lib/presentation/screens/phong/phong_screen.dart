@@ -4,11 +4,13 @@ import '../../bloc/phong/phong_bloc.dart';
 import '../../bloc/phong/phong_event.dart';
 import '../../bloc/phong/phong_state.dart';
 import '../../../domain/entities/nha_tro_entity.dart';
+import '../../../domain/entities/phong_entity.dart';
 import '../../widgets/empty_data_widget.dart';
 import '../../widgets/app_confirm_dialog.dart';
 import '../../../core/constants/app_colors.dart';
 import 'widgets/phong_card_widget.dart';
 import 'widgets/them_nha_tro_dialog.dart';
+import 'widgets/phong_detail_dialog.dart';
 
 class PhongScreen extends StatelessWidget {
   const PhongScreen({super.key});
@@ -171,15 +173,31 @@ class _NhaTroSection extends StatelessWidget {
             itemBuilder: (context, index) {
               return PhongCardWidget(
                 phong: phongList[index],
-                onTap: () {
-                  // TODO: Navigate to Room Details
-                },
+                onTap: () => _showPhongDetail(context, phongList[index], nhaTro.tenNhaTro),
               );
             },
           ),
         const SizedBox(height: 16),
         const Divider(),
       ],
+    );
+  }
+
+  void _showPhongDetail(BuildContext context, PhongEntity phong, String nhaTroName) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => DraggableScrollableSheet(
+        initialChildSize: 0.65,
+        maxChildSize: 0.9,
+        minChildSize: 0.4,
+        expand: false,
+        builder: (_, __) => PhongDetailDialog(
+          phong: phong,
+          nhaTroName: nhaTroName,
+        ),
+      ),
     );
   }
 

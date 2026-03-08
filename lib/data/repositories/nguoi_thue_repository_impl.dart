@@ -29,4 +29,10 @@ class NguoiThueRepositoryImpl implements NguoiThueRepository {
   Future<void> xoaNguoiThue(String nguoiThueId) {
     return remoteDataSource.xoaNguoiThue(nguoiThueId);
   }
+
+  @override
+  Future<NguoiThueEntity?> getNguoiThueById(String nguoiThueId) async {
+    final model = await remoteDataSource.getNguoiThueById(nguoiThueId);
+    return model?.toEntity();
+  }
 }

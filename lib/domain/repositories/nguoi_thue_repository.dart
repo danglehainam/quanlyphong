@@ -5,4 +5,5 @@ abstract class NguoiThueRepository {
   Future<String> themNguoiThue(NguoiThueEntity nguoiThue);
   Future<void> updateNguoiThue(NguoiThueEntity nguoiThue);
   Future<void> xoaNguoiThue(String nguoiThueId);
+  Future<NguoiThueEntity?> getNguoiThueById(String nguoiThueId);
 }
